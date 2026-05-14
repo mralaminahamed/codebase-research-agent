@@ -99,7 +99,7 @@ REST_FRAMEWORK = {
 JAZZMIN_SETTINGS = {
     "site_title": "Research Agent",
     "site_header": "Codebase Research Agent",
-    "site_brand": "🔬 Research Agent",
+    "site_brand": "Research Agent",
     "site_logo": None,
     "welcome_sign": "Codebase Research Agent — Admin",
     "copyright": "Al Amin Ahamed",

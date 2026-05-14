@@ -306,10 +306,6 @@ fieldset.module h2 {
 }
 
 /* ─── Dashboard: app list ────────────────────────────────────────────────── */
-.app-research .model-researchsession > th::before { content: "🔍 "; }
-.app-research .model-repository      > th::before { content: "📦 "; }
-.app-research .model-toolcall         > th::before { content: "🔧 "; }
-.app-research .model-finding          > th::before { content: "💡 "; }
 
 /* ─── Footer ─────────────────────────────────────────────────────────────── */
 .main-footer {

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static icons %}
 
 {% block title %}Codebase Research Agent{% endblock %}
 
@@ -16,7 +16,7 @@
   <section class="py-24 pb-[72px] border-b border-border">
     <div class="max-w-[900px] mx-auto px-6">
       <p class="text-[0.72rem] text-amber-dim tracking-[0.14em] uppercase mb-5 flex items-center gap-2 animate-fade-up">
-        <span class="text-amber animate-blink">▶</span>
+        {% icon "chevron-right" cls="w-3 h-3 text-amber animate-blink inline" %}
         AI · Codebase Research · Tool-Use Loop
       </p>
       <h1 class="text-[clamp(2rem,5vw,3.4rem)] font-bold text-text-bright leading-[1.1] mb-3 tracking-tight animate-fade-up" style="animation-delay:.1s">
@@ -63,25 +63,25 @@
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-px bg-border border border-border rounded-md overflow-hidden">
         <div class="bg-bg2 p-7 hover:bg-bg3 transition-colors duration-150">
           <div class="text-[0.65rem] text-amber tracking-[0.12em] mb-3 opacity-70">01 —</div>
-          <span class="text-[1.4rem] mb-3 block">📦</span>
+          {% icon "package" cls="w-7 h-7 mb-3 text-amber-lt" %}
           <div class="text-[0.88rem] font-semibold text-text-bright mb-2">Clone the repository</div>
           <div class="text-[0.78rem] text-text-dim leading-[1.7] font-sans font-light">Shallow clone (<code class="bg-bg border border-border rounded px-1 text-[0.85em] text-amber-lt">depth=1</code>) into local storage. Subsequent calls fetch + reset.</div>
         </div>
         <div class="bg-bg2 p-7 hover:bg-bg3 transition-colors duration-150">
           <div class="text-[0.65rem] text-amber tracking-[0.12em] mb-3 opacity-70">02 —</div>
-          <span class="text-[1.4rem] mb-3 block">🗄️</span>
+          {% icon "database" cls="w-7 h-7 mb-3 text-cyan" %}
           <div class="text-[0.88rem] font-semibold text-text-bright mb-2">Read prior findings</div>
           <div class="text-[0.78rem] text-text-dim leading-[1.7] font-sans font-light">First tool call is always <code class="bg-bg border border-border rounded px-1 text-[0.85em] text-amber-lt">get_previous_findings</code>. Builds on prior sessions.</div>
         </div>
         <div class="bg-bg2 p-7 hover:bg-bg3 transition-colors duration-150">
           <div class="text-[0.65rem] text-amber tracking-[0.12em] mb-3 opacity-70">03 —</div>
-          <span class="text-[1.4rem] mb-3 block">🔍</span>
+          {% icon "search" cls="w-7 h-7 mb-3 text-amber" %}
           <div class="text-[0.88rem] font-semibold text-text-bright mb-2">Explore the code</div>
           <div class="text-[0.78rem] text-text-dim leading-[1.7] font-sans font-light"><code class="bg-bg border border-border rounded px-1 text-[0.85em] text-amber-lt">list_files</code> → <code class="bg-bg border border-border rounded px-1 text-[0.85em] text-amber-lt">search_code</code> → <code class="bg-bg border border-border rounded px-1 text-[0.85em] text-amber-lt">read_file</code>. Saves each relevant location.</div>
         </div>
         <div class="bg-bg2 p-7 hover:bg-bg3 transition-colors duration-150">
           <div class="text-[0.65rem] text-amber tracking-[0.12em] mb-3 opacity-70">04 —</div>
-          <span class="text-[1.4rem] mb-3 block">✅</span>
+          {% icon "circle-check" cls="w-7 h-7 mb-3 text-green" %}
           <div class="text-[0.88rem] font-semibold text-text-bright mb-2">Return a cited answer</div>
           <div class="text-[0.78rem] text-text-dim leading-[1.7] font-sans font-light">Final answer cites file paths and line numbers. All tool calls persisted. Token usage tracked.</div>
         </div>

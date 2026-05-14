@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static icons %}
 
 {% block title %}Run Research · Codebase Research Agent{% endblock %}
 
@@ -61,8 +61,8 @@
                     class="w-full bg-bg border border-border2 rounded text-text-bright font-mono text-[0.82rem] px-3 py-2.5 outline-none focus:border-amber focus:shadow-[0_0_0_2px_rgba(245,158,11,0.15)] transition-all placeholder:text-text-dim min-h-[100px] leading-[1.6] resize-y">How does requests handle SSL certificate verification?</textarea>
         </div>
         <button id="submit-btn" type="submit"
-                class="w-full py-3 bg-amber text-black border-none rounded font-mono text-[0.8rem] font-bold tracking-[0.1em] uppercase cursor-pointer hover:bg-amber-lt hover:shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-          ▶ Run Research
+                class="w-full py-3 bg-amber text-black border-none rounded font-mono text-[0.8rem] font-bold tracking-[0.1em] uppercase cursor-pointer hover:bg-amber-lt hover:shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2">
+          {% icon "play" cls="w-4 h-4" %} Run Research
         </button>
       </form>
     </div>
@@ -118,7 +118,9 @@
     </div>
 
     <div id="empty-state" class="py-16 px-5 text-center text-text-dim">
-      <div class="text-[2rem] mb-3 opacity-40">🔬</div>
+      <div class="flex justify-center mb-4 opacity-30">
+        {% icon "microscope" cls="w-12 h-12" %}
+      </div>
       <p class="text-[0.8rem]">Submit a question to start researching a repository.</p>
       <p class="mt-1.5 text-[0.72rem]">Agent runs synchronously — results appear when complete (20–90 s).</p>
     </div>
@@ -231,7 +233,8 @@
     const repo_url = $('repo_url').value.trim();
     const question = $('question').value.trim();
     resetResults(); hide('empty-state'); show('terminal');
-    btn.disabled = true; btn.textContent = '⏳ Running...';
+    btn.disabled = true;
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 animate-spin" style="animation:spin-slow 1s linear infinite"><line x1="12" x2="12" y1="2" y2="6"/><line x1="12" x2="12" y1="18" y2="22"/><line x1="4.93" x2="7.76" y1="4.93" y2="7.76"/><line x1="16.24" x2="19.07" y1="16.24" y2="19.07"/><line x1="2" x2="6" y1="12" y2="12"/><line x1="18" x2="22" y1="12" y2="12"/><line x1="4.93" x2="7.76" y1="19.07" y2="16.24"/><line x1="16.24" x2="19.07" y1="7.76" y2="4.93"/></svg> Running...';
     log(`Submitting request to POST /api/sessions/`,'info');
     log(`repo_url: ${repo_url}`,'amber');
     log(`question: ${question.slice(0,60)}${question.length>60?'…':''}`,'amber');
@@ -261,7 +264,8 @@
       log(`Network error: ${err.message}`,'error');
       const b=$('error-box'); b.textContent=`✗ ${err.message}`; show('error-box');
     } finally {
-      btn.disabled=false; btn.textContent='▶ Run Research';
+      btn.disabled=false;
+      btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polygon points="6 3 20 12 6 21 6 3"/></svg> Run Research';
     }
   }
 </script>
