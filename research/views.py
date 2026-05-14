@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import TemplateView
 from rest_framework import status
 from rest_framework.generics import ListAPIView, RetrieveAPIView
@@ -23,6 +25,7 @@ class IndexView(TemplateView):
     template_name = "research/index.html"
 
 
+@method_decorator(ensure_csrf_cookie, name="dispatch")
 class ResearchUIView(TemplateView):
     """Interactive research UI at /research/."""
 

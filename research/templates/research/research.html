@@ -651,6 +651,12 @@
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
+  // ── CSRF ─────────────────────────────────────────────────────────────────
+  function getCsrfToken() {
+    const match = document.cookie.match(/csrftoken=([^;]+)/);
+    return match ? match[1] : '';
+  }
+
   // ── Main research handler ────────────────────────────────────────────────
   async function runResearch(e) {
     e.preventDefault();
@@ -674,7 +680,10 @@
     try {
       const res = await fetch('/api/sessions/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCsrfToken(),
+        },
         body: JSON.stringify({ repo_url, question }),
       });
 
