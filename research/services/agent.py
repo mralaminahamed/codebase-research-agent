@@ -129,6 +129,19 @@ def run(session: ResearchSession) -> ResearchSession:
         # g. Feed results back to the model.
         adapter.append_tool_results(messages, response.tool_calls, results)
 
+        # h. Budget warning — force synthesis when 2 iterations remain.
+        remaining = settings.MAX_AGENT_ITERATIONS - (iteration + 1)
+        if remaining <= 2:
+            messages.append({
+                "role": "user",
+                "content": (
+                    f"IMPORTANT: You have {remaining} tool call(s) left. "
+                    "Stop exploring and write your final answer NOW based on "
+                    "everything found so far. Cite file paths and line numbers. "
+                    "Do not make any more tool calls."
+                ),
+            })
+
     else:
         # Loop exhausted — iteration cap reached.
         if session.status == ResearchSession.Status.RUNNING:
