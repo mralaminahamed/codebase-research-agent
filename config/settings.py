@@ -135,7 +135,7 @@ JAZZMIN_SETTINGS = {
     "show_ui_builder": False,
     "changeform_format": "horizontal_tabs",
     "language_chooser": False,
-    "custom_css": "admin/css/custom_admin.css",
+    "custom_css": "admin/css/admin_theme.css",
     "custom_js": None,
 }
 

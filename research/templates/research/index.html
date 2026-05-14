@@ -1,53 +1,35 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Codebase Research Agent</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="{% static 'css/tailwind.css' %}" />
-</head>
 
-<body class="font-mono bg-bg text-text leading-[1.7] overflow-x-hidden">
+{% block title %}Codebase Research Agent{% endblock %}
 
-  <!-- Topbar -->
-  <header class="border-b border-border py-3.5 sticky top-0 bg-bg/[0.92] backdrop-blur-md z-[100]">
-    <div class="max-w-[900px] mx-auto px-6 flex justify-between items-center relative z-[1]">
-      <a class="text-[0.78rem] font-semibold text-amber tracking-[0.1em] uppercase no-underline" href="/">
-        <span class="text-text-dim">$</span> research<span class="text-text-dim">-</span>agent
-      </a>
-      <ul class="flex gap-6 list-none max-sm:hidden">
-        <li><a class="text-[0.72rem] text-text-dim no-underline tracking-[0.06em] uppercase hover:text-amber transition-colors duration-150" href="#how">How it works</a></li>
-        <li><a class="text-[0.72rem] text-text-dim no-underline tracking-[0.06em] uppercase hover:text-amber transition-colors duration-150" href="#api">API</a></li>
-        <li><a class="text-[0.72rem] text-text-dim no-underline tracking-[0.06em] uppercase hover:text-amber transition-colors duration-150" href="#stack">Stack</a></li>
-        <li><a class="text-[0.72rem] text-text-dim no-underline tracking-[0.06em] uppercase hover:text-amber transition-colors duration-150" href="/admin/">Admin ↗</a></li>
-      </ul>
-    </div>
-  </header>
+{% block extra_nav %}
+<li><a href="#how" class="text-[0.72rem] text-text-dim no-underline tracking-[0.06em] uppercase hover:text-amber transition-colors duration-150">How it works</a></li>
+<li><a href="#api"   class="text-[0.72rem] text-text-dim no-underline tracking-[0.06em] uppercase hover:text-amber transition-colors duration-150">API</a></li>
+<li><a href="#stack" class="text-[0.72rem] text-text-dim no-underline tracking-[0.06em] uppercase hover:text-amber transition-colors duration-150">Stack</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="relative z-[1]">
 
   <!-- Hero -->
   <section class="py-24 pb-[72px] border-b border-border">
-    <div class="max-w-[900px] mx-auto px-6 relative z-[1]">
-      <p class="text-[0.72rem] text-amber-dim tracking-[0.14em] uppercase mb-5 flex items-center gap-2 animate-fade-up"
-         style="animation-delay:0s">
+    <div class="max-w-[900px] mx-auto px-6">
+      <p class="text-[0.72rem] text-amber-dim tracking-[0.14em] uppercase mb-5 flex items-center gap-2 animate-fade-up">
         <span class="text-amber animate-blink">▶</span>
         AI · Codebase Research · Tool-Use Loop
       </p>
-      <h1 class="text-[clamp(2rem,5vw,3.4rem)] font-bold text-text-bright leading-[1.1] mb-3 tracking-tight animate-fade-up"
-          style="animation-delay:0.1s">
+      <h1 class="text-[clamp(2rem,5vw,3.4rem)] font-bold text-text-bright leading-[1.1] mb-3 tracking-tight animate-fade-up" style="animation-delay:.1s">
         Ask questions.<br>
         <span class="text-amber">Get answers</span> from<br>
         the code itself.
       </h1>
-      <p class="text-[0.92rem] text-text-dim max-w-[560px] leading-[1.8] mb-10 font-sans font-light animate-fade-up"
-         style="animation-delay:0.2s">
-        An AI agent that explores public GitHub repositories using tool-calling to answer your natural-language questions.
-        Every session is persisted. Prior findings inform future research.
+      <p class="text-[0.92rem] text-text-dim max-w-[560px] leading-[1.8] mb-10 font-sans font-light animate-fade-up" style="animation-delay:.2s">
+        An AI agent that explores public GitHub repositories using tool-calling
+        to answer your natural-language questions. Every session is persisted.
+        Prior findings inform future research.
       </p>
-      <div class="flex gap-3 flex-wrap animate-fade-up" style="animation-delay:0.3s">
+      <div class="flex gap-3 flex-wrap animate-fade-up" style="animation-delay:.3s">
         <a class="inline-flex items-center gap-2 px-[22px] py-[10px] rounded bg-amber text-black border border-amber text-[0.78rem] font-bold tracking-[0.06em] uppercase no-underline hover:bg-amber-lt hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-all duration-150" href="/research/">Try it now →</a>
         <a class="inline-flex items-center gap-2 px-[22px] py-[10px] rounded bg-transparent text-amber border border-border2 text-[0.78rem] font-bold tracking-[0.06em] uppercase no-underline hover:border-amber hover:bg-[rgba(245,158,11,0.10)] transition-all duration-150" href="/admin/">Open Admin ↗</a>
         <a class="inline-flex items-center gap-2 px-[22px] py-[10px] rounded bg-transparent text-amber border border-border2 text-[0.78rem] font-bold tracking-[0.06em] uppercase no-underline hover:border-amber hover:bg-[rgba(245,158,11,0.10)] transition-all duration-150" href="https://github.com/mralaminahamed/codebase-research-agent" target="_blank">GitHub ↗</a>
@@ -56,19 +38,26 @@
   </section>
 
   <!-- Stats -->
-  <div class="max-w-[900px] mx-auto px-6 relative z-[1]">
-    <div class="grid grid-cols-5 max-sm:grid-cols-3 border-b border-border animate-fade-up" style="animation-delay:0.35s">
+  <div class="max-w-[900px] mx-auto px-6">
+    <div class="grid grid-cols-5 max-sm:grid-cols-3 border-b border-border animate-fade-up" style="animation-delay:.35s">
+      {% for val, label in stats %}
+      <div class="py-5 {% if not forloop.last %}border-r border-border{% endif %}">
+        <div class="text-[1.6rem] font-bold text-amber leading-none mb-1">{{ val }}</div>
+        <div class="text-[0.68rem] text-text-dim uppercase tracking-[0.1em]">{{ label }}</div>
+      </div>
+      {% empty %}
       <div class="py-5 border-r border-border"><div class="text-[1.6rem] font-bold text-amber leading-none mb-1">7</div><div class="text-[0.68rem] text-text-dim uppercase tracking-[0.1em]">Agent tools</div></div>
       <div class="py-5 border-r border-border"><div class="text-[1.6rem] font-bold text-amber leading-none mb-1">2</div><div class="text-[0.68rem] text-text-dim uppercase tracking-[0.1em]">LLM providers</div></div>
       <div class="py-5 border-r border-border"><div class="text-[1.6rem] font-bold text-amber leading-none mb-1">4</div><div class="text-[0.68rem] text-text-dim uppercase tracking-[0.1em]">DB tables</div></div>
       <div class="py-5 border-r border-border"><div class="text-[1.6rem] font-bold text-amber leading-none mb-1">3</div><div class="text-[0.68rem] text-text-dim uppercase tracking-[0.1em]">REST endpoints</div></div>
       <div class="py-5"><div class="text-[1.6rem] font-bold text-amber leading-none mb-1">24</div><div class="text-[0.68rem] text-text-dim uppercase tracking-[0.1em]">Tests</div></div>
+      {% endfor %}
     </div>
   </div>
 
   <!-- How it works -->
   <section class="py-[72px] border-b border-border" id="how">
-    <div class="max-w-[900px] mx-auto px-6 relative z-[1]">
+    <div class="max-w-[900px] mx-auto px-6">
       <p class="text-[0.68rem] text-amber tracking-[0.16em] uppercase mb-2.5">// Process</p>
       <h2 class="text-[1.5rem] font-bold text-text-bright mb-10 tracking-tight">How the agent works</h2>
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-px bg-border border border-border rounded-md overflow-hidden">
@@ -102,13 +91,11 @@
 
   <!-- API Reference -->
   <section class="py-[72px] border-b border-border" id="api">
-    <div class="max-w-[900px] mx-auto px-6 relative z-[1]">
+    <div class="max-w-[900px] mx-auto px-6">
       <p class="text-[0.68rem] text-amber tracking-[0.16em] uppercase mb-2.5">// REST API</p>
       <h2 class="text-[1.5rem] font-bold text-text-bright mb-10 tracking-tight">Three endpoints under <code class="text-amber text-[1.1rem]">/api/</code></h2>
-
       <div class="flex flex-col gap-4">
 
-        <!-- POST /api/sessions/ -->
         <div class="border border-border rounded-md overflow-hidden hover:border-border2 transition-colors duration-150">
           <div class="flex items-center gap-3 px-5 py-3.5 bg-bg2 border-b border-border cursor-pointer select-none" onclick="toggle(this)">
             <span class="text-[0.65rem] font-bold tracking-[0.1em] px-2 py-0.5 rounded-[3px] min-w-[44px] text-center bg-[rgba(16,185,129,0.15)] text-green border border-[rgba(16,185,129,0.3)]">POST</span>
@@ -132,7 +119,6 @@
           </div>
         </div>
 
-        <!-- GET /api/sessions/:id -->
         <div class="border border-border rounded-md overflow-hidden hover:border-border2 transition-colors duration-150">
           <div class="flex items-center gap-3 px-5 py-3.5 bg-bg2 border-b border-border cursor-pointer select-none" onclick="toggle(this)">
             <span class="text-[0.65rem] font-bold tracking-[0.1em] px-2 py-0.5 rounded-[3px] min-w-[44px] text-center bg-[rgba(34,211,238,0.12)] text-cyan border border-[rgba(34,211,238,0.25)]">GET</span>
@@ -153,7 +139,6 @@
           </div>
         </div>
 
-        <!-- GET /api/repositories/:id/sessions/ -->
         <div class="border border-border rounded-md overflow-hidden hover:border-border2 transition-colors duration-150">
           <div class="flex items-center gap-3 px-5 py-3.5 bg-bg2 border-b border-border cursor-pointer select-none" onclick="toggle(this)">
             <span class="text-[0.65rem] font-bold tracking-[0.1em] px-2 py-0.5 rounded-[3px] min-w-[44px] text-center bg-[rgba(34,211,238,0.12)] text-cyan border border-[rgba(34,211,238,0.25)]">GET</span>
@@ -180,58 +165,44 @@
 
   <!-- Tech Stack -->
   <section class="py-[72px] border-b border-border" id="stack">
-    <div class="max-w-[900px] mx-auto px-6 relative z-[1]">
+    <div class="max-w-[900px] mx-auto px-6">
       <p class="text-[0.68rem] text-amber tracking-[0.16em] uppercase mb-2.5">// Tech Stack</p>
       <h2 class="text-[1.5rem] font-bold text-text-bright mb-10 tracking-tight">Built with</h2>
       <div class="flex flex-wrap gap-2">
+        {% for badge in highlighted_badges %}
+        <span class="text-[0.72rem] px-3 py-1.5 border border-[rgba(245,158,11,0.4)] rounded-[3px] text-amber bg-[rgba(245,158,11,0.10)] tracking-[0.06em]">{{ badge }}</span>
+        {% empty %}
         <span class="text-[0.72rem] px-3 py-1.5 border border-[rgba(245,158,11,0.4)] rounded-[3px] text-amber bg-[rgba(245,158,11,0.10)] tracking-[0.06em]">Python 3.11</span>
         <span class="text-[0.72rem] px-3 py-1.5 border border-[rgba(245,158,11,0.4)] rounded-[3px] text-amber bg-[rgba(245,158,11,0.10)] tracking-[0.06em]">Django 5.0</span>
         <span class="text-[0.72rem] px-3 py-1.5 border border-[rgba(245,158,11,0.4)] rounded-[3px] text-amber bg-[rgba(245,158,11,0.10)] tracking-[0.06em]">Django REST Framework</span>
         <span class="text-[0.72rem] px-3 py-1.5 border border-[rgba(245,158,11,0.4)] rounded-[3px] text-amber bg-[rgba(245,158,11,0.10)] tracking-[0.06em]">PostgreSQL 16</span>
+        {% endfor %}
         <span class="text-[0.72rem] px-3 py-1.5 border border-border2 rounded-[3px] text-text-dim bg-bg2 tracking-[0.06em] hover:border-amber hover:text-amber hover:bg-[rgba(245,158,11,0.10)] transition-all duration-150">OpenAI gpt-4o</span>
         <span class="text-[0.72rem] px-3 py-1.5 border border-border2 rounded-[3px] text-text-dim bg-bg2 tracking-[0.06em] hover:border-amber hover:text-amber hover:bg-[rgba(245,158,11,0.10)] transition-all duration-150">Anthropic claude-sonnet-4-6</span>
         <span class="text-[0.72rem] px-3 py-1.5 border border-border2 rounded-[3px] text-text-dim bg-bg2 tracking-[0.06em] hover:border-amber hover:text-amber hover:bg-[rgba(245,158,11,0.10)] transition-all duration-150">gitpython</span>
         <span class="text-[0.72rem] px-3 py-1.5 border border-border2 rounded-[3px] text-text-dim bg-bg2 tracking-[0.06em] hover:border-amber hover:text-amber hover:bg-[rgba(245,158,11,0.10)] transition-all duration-150">ripgrep</span>
-        <span class="text-[0.72rem] px-3 py-1.5 border border-border2 rounded-[3px] text-text-dim bg-bg2 tracking-[0.06em] hover:border-amber hover:text-amber hover:bg-[rgba(245,158,11,0.10)] transition-all duration-150">docker compose</span>
         <span class="text-[0.72rem] px-3 py-1.5 border border-border2 rounded-[3px] text-text-dim bg-bg2 tracking-[0.06em] hover:border-amber hover:text-amber hover:bg-[rgba(245,158,11,0.10)] transition-all duration-150">Tailwind CSS v4</span>
+        <span class="text-[0.72rem] px-3 py-1.5 border border-border2 rounded-[3px] text-text-dim bg-bg2 tracking-[0.06em] hover:border-amber hover:text-amber hover:bg-[rgba(245,158,11,0.10)] transition-all duration-150">docker compose</span>
         <span class="text-[0.72rem] px-3 py-1.5 border border-border2 rounded-[3px] text-text-dim bg-bg2 tracking-[0.06em] hover:border-amber hover:text-amber hover:bg-[rgba(245,158,11,0.10)] transition-all duration-150">pytest</span>
         <span class="text-[0.72rem] px-3 py-1.5 border border-border2 rounded-[3px] text-text-dim bg-bg2 tracking-[0.06em] hover:border-amber hover:text-amber hover:bg-[rgba(245,158,11,0.10)] transition-all duration-150">whitenoise</span>
       </div>
     </div>
   </section>
 
-  <!-- Glow divider -->
-  <div class="h-px bg-gradient-to-r from-transparent via-amber to-transparent opacity-30"></div>
+</div>
+{% endblock %}
 
-  <!-- Footer -->
-  <div class="max-w-[900px] mx-auto px-6 relative z-[1]">
-    <footer class="py-10 flex justify-between items-center flex-wrap gap-4 max-sm:flex-col max-sm:items-start">
-      <p class="text-[0.72rem] text-text-dim">
-        Built by <a class="text-amber no-underline hover:underline" href="https://github.com/mralaminahamed" target="_blank">Al Amin Ahamed</a>
-        &nbsp;·&nbsp; Take-home for <a class="text-amber no-underline hover:underline" href="mailto:hr@codefusionai.com">CodeFusion AI</a>
-      </p>
-      <ul class="flex gap-5 list-none">
-        <li><a class="text-[0.72rem] text-text-dim no-underline tracking-[0.06em] uppercase hover:text-amber transition-colors" href="/admin/">Admin</a></li>
-        <li><a class="text-[0.72rem] text-text-dim no-underline tracking-[0.06em] uppercase hover:text-amber transition-colors" href="/api/sessions/" target="_blank">Sessions API</a></li>
-        <li><a class="text-[0.72rem] text-text-dim no-underline tracking-[0.06em] uppercase hover:text-amber transition-colors" href="https://github.com/mralaminahamed/codebase-research-agent" target="_blank">GitHub</a></li>
-      </ul>
-    </footer>
-  </div>
-
-  <script>
-    function toggle(header) {
-      header.nextElementSibling.classList.toggle('open');
-    }
-    function copyCode(btn) {
-      const pre = btn.closest('.bg-bg').querySelector('pre');
-      navigator.clipboard.writeText(pre.innerText).then(() => {
-        const orig = btn.textContent;
-        btn.textContent = 'copied!';
-        btn.style.color = 'var(--color-green)';
-        setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1800);
-      });
-    }
-  </script>
-
-</body>
-</html>
+{% block extra_scripts %}
+<script>
+  function toggle(header) { header.nextElementSibling.classList.toggle('open'); }
+  function copyCode(btn) {
+    const pre = btn.closest('.bg-bg').querySelector('pre');
+    navigator.clipboard.writeText(pre.innerText).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = 'copied!';
+      btn.style.color = '#10b981';
+      setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1800);
+    });
+  }
+</script>
+{% endblock %}

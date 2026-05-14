@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@source "./research/templates";
+@source "../research/templates";
 
 @theme {
   /* Surfaces */

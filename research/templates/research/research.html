@@ -1,326 +1,268 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Run Research · Codebase Research Agent</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="{% static 'css/tailwind.css' %}" />
-</head>
 
-<body class="font-mono bg-bg text-text leading-[1.7] min-h-screen">
+{% block title %}Run Research · Codebase Research Agent{% endblock %}
 
-  <!-- Topbar -->
-  <header class="border-b border-border py-3.5 sticky top-0 bg-bg/[0.92] backdrop-blur-md z-[100]">
-    <div class="max-w-[1100px] mx-auto px-6 flex justify-between items-center">
-      <a class="text-[0.78rem] font-semibold text-amber tracking-[0.1em] uppercase no-underline" href="/">
-        <span class="text-text-dim">$</span> research<span class="text-text-dim">-</span>agent
-      </a>
-      <ul class="flex gap-6 list-none">
-        <li><a class="text-[0.72rem] text-text-dim no-underline tracking-[0.06em] uppercase hover:text-amber transition-colors" href="/">Home</a></li>
-        <li><a class="text-[0.72rem] text-amber no-underline tracking-[0.06em] uppercase" href="/research/">Research</a></li>
-        <li><a class="text-[0.72rem] text-text-dim no-underline tracking-[0.06em] uppercase hover:text-amber transition-colors" href="/admin/">Admin ↗</a></li>
-      </ul>
+{% block body_class %}font-mono bg-bg text-text leading-[1.7] min-h-screen{% endblock %}
+
+{% block topbar_container %}max-w-[1100px]{% endblock %}
+{% block footer_container %}max-w-[1100px]{% endblock %}
+
+{% block content %}
+<div class="max-w-[1100px] mx-auto px-6 py-12 pb-20 relative z-[1] grid grid-cols-[380px_1fr] max-[820px]:grid-cols-1 gap-7 items-start">
+
+  <!-- LEFT: Form -->
+  <div class="bg-bg2 border border-border rounded-md overflow-hidden">
+    <div class="flex items-center gap-2 px-[18px] py-3.5 border-b border-border bg-bg3">
+      <span class="w-2 h-2 rounded-full bg-red"></span>
+      <span class="w-2 h-2 rounded-full bg-yellow"></span>
+      <span class="w-2 h-2 rounded-full bg-green"></span>
+      <span class="text-[0.72rem] text-text-dim tracking-[0.1em] uppercase ml-1.5">new_session.sh</span>
     </div>
-  </header>
+    <div class="p-5">
 
-  <!-- Main grid -->
-  <div class="max-w-[1100px] mx-auto px-6 py-12 pb-20 relative z-[1] grid grid-cols-[380px_1fr] max-[820px]:grid-cols-1 gap-7 items-start">
-
-    <!-- LEFT: Form panel -->
-    <div class="bg-bg2 border border-border rounded-md overflow-hidden">
-      <!-- Mac-style titlebar -->
-      <div class="flex items-center gap-2 px-[18px] py-3.5 border-b border-border bg-bg3">
-        <span class="w-2 h-2 rounded-full bg-red"></span>
-        <span class="w-2 h-2 rounded-full bg-yellow"></span>
-        <span class="w-2 h-2 rounded-full bg-green"></span>
-        <span class="text-[0.72rem] text-text-dim tracking-[0.1em] uppercase ml-1.5">new_session.sh</span>
-      </div>
-      <div class="p-5">
-
-        <!-- Presets -->
-        <div class="mb-[18px]">
-          <div class="text-[0.68rem] text-amber tracking-[0.12em] uppercase mb-1">Quick presets</div>
-          <div class="flex flex-col gap-1.5 mt-2">
-            <button class="px-3 py-2 bg-bg border border-border rounded text-left cursor-pointer hover:border-amber hover:bg-[rgba(245,158,11,0.10)] transition-all duration-150"
-                    onclick="fillPreset('https://github.com/psf/requests','How does requests handle SSL certificate verification?')">
-              <span class="text-[0.7rem] text-cyan block mb-0.5">psf/requests</span>
-              <span class="text-[0.72rem] text-text-dim">How does requests handle SSL certificate verification?</span>
-            </button>
-            <button class="px-3 py-2 bg-bg border border-border rounded text-left cursor-pointer hover:border-amber hover:bg-[rgba(245,158,11,0.10)] transition-all duration-150"
-                    onclick="fillPreset('https://github.com/psf/requests','Where is authentication implemented in the requests library?')">
-              <span class="text-[0.7rem] text-cyan block mb-0.5">psf/requests</span>
-              <span class="text-[0.72rem] text-text-dim">Where is authentication implemented?</span>
-            </button>
-            <button class="px-3 py-2 bg-bg border border-border rounded text-left cursor-pointer hover:border-amber hover:bg-[rgba(245,158,11,0.10)] transition-all duration-150"
-                    onclick="fillPreset('https://github.com/pallets/flask','How does Flask handle request routing internally?')">
-              <span class="text-[0.7rem] text-cyan block mb-0.5">pallets/flask</span>
-              <span class="text-[0.72rem] text-text-dim">How does Flask handle request routing internally?</span>
-            </button>
-          </div>
-        </div>
-
-        <hr class="border-border mb-[18px]" />
-
-        <form id="research-form" onsubmit="runResearch(event)">
-          <div class="mb-[18px]">
-            <label class="block text-[0.68rem] text-amber tracking-[0.12em] uppercase mb-2">GitHub Repository URL</label>
-            <div class="text-[0.65rem] text-text-dim mb-1.5">Must be a public HTTPS GitHub URL</div>
-            <input id="repo_url" type="url" name="repo_url"
-                   class="w-full bg-bg border border-border2 rounded text-text-bright font-mono text-[0.82rem] px-3 py-2.5 outline-none focus:border-amber focus:shadow-[0_0_0_2px_rgba(245,158,11,0.15)] transition-all placeholder:text-text-dim"
-                   placeholder="https://github.com/owner/repo"
-                   value="https://github.com/psf/requests" required />
-          </div>
-
-          <div class="mb-[18px]">
-            <label class="block text-[0.68rem] text-amber tracking-[0.12em] uppercase mb-2">Research Question</label>
-            <div class="text-[0.65rem] text-text-dim mb-1.5">Be specific. Min 10 chars.</div>
-            <textarea id="question" name="question" minlength="10" required
-                      class="w-full bg-bg border border-border2 rounded text-text-bright font-mono text-[0.82rem] px-3 py-2.5 outline-none focus:border-amber focus:shadow-[0_0_0_2px_rgba(245,158,11,0.15)] transition-all placeholder:text-text-dim min-h-[100px] leading-[1.6] resize-y"
-                      placeholder="How does the authentication module work?">How does requests handle SSL certificate verification?</textarea>
-          </div>
-
-          <button id="submit-btn" type="submit"
-                  class="w-full py-3 bg-amber text-black border-none rounded font-mono text-[0.8rem] font-bold tracking-[0.1em] uppercase cursor-pointer hover:bg-amber-lt hover:shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-            ▶ Run Research
+      <div class="mb-[18px]">
+        <div class="text-[0.68rem] text-amber tracking-[0.12em] uppercase mb-1">Quick presets</div>
+        <div class="flex flex-col gap-1.5 mt-2">
+          <button class="px-3 py-2 bg-bg border border-border rounded text-left cursor-pointer hover:border-amber hover:bg-[rgba(245,158,11,0.10)] transition-all duration-150"
+                  onclick="fillPreset('https://github.com/psf/requests','How does requests handle SSL certificate verification?')">
+            <span class="text-[0.7rem] text-cyan block mb-0.5">psf/requests</span>
+            <span class="text-[0.72rem] text-text-dim">How does requests handle SSL certificate verification?</span>
           </button>
-        </form>
+          <button class="px-3 py-2 bg-bg border border-border rounded text-left cursor-pointer hover:border-amber hover:bg-[rgba(245,158,11,0.10)] transition-all duration-150"
+                  onclick="fillPreset('https://github.com/psf/requests','Where is authentication implemented in the requests library?')">
+            <span class="text-[0.7rem] text-cyan block mb-0.5">psf/requests</span>
+            <span class="text-[0.72rem] text-text-dim">Where is authentication implemented?</span>
+          </button>
+          <button class="px-3 py-2 bg-bg border border-border rounded text-left cursor-pointer hover:border-amber hover:bg-[rgba(245,158,11,0.10)] transition-all duration-150"
+                  onclick="fillPreset('https://github.com/pallets/flask','How does Flask handle request routing internally?')">
+            <span class="text-[0.7rem] text-cyan block mb-0.5">pallets/flask</span>
+            <span class="text-[0.72rem] text-text-dim">How does Flask handle request routing internally?</span>
+          </button>
+        </div>
       </div>
+
+      <hr class="border-border mb-[18px]" />
+
+      <form id="research-form" onsubmit="runResearch(event)">
+        <div class="mb-[18px]">
+          <label class="block text-[0.68rem] text-amber tracking-[0.12em] uppercase mb-2">GitHub Repository URL</label>
+          <div class="text-[0.65rem] text-text-dim mb-1.5">Must be a public HTTPS GitHub URL</div>
+          <input id="repo_url" type="url" name="repo_url" required
+                 value="https://github.com/psf/requests"
+                 placeholder="https://github.com/owner/repo"
+                 class="w-full bg-bg border border-border2 rounded text-text-bright font-mono text-[0.82rem] px-3 py-2.5 outline-none focus:border-amber focus:shadow-[0_0_0_2px_rgba(245,158,11,0.15)] transition-all placeholder:text-text-dim" />
+        </div>
+        <div class="mb-[18px]">
+          <label class="block text-[0.68rem] text-amber tracking-[0.12em] uppercase mb-2">Research Question</label>
+          <div class="text-[0.65rem] text-text-dim mb-1.5">Be specific. Min 10 chars.</div>
+          <textarea id="question" name="question" minlength="10" required
+                    placeholder="How does the authentication module work?"
+                    class="w-full bg-bg border border-border2 rounded text-text-bright font-mono text-[0.82rem] px-3 py-2.5 outline-none focus:border-amber focus:shadow-[0_0_0_2px_rgba(245,158,11,0.15)] transition-all placeholder:text-text-dim min-h-[100px] leading-[1.6] resize-y">How does requests handle SSL certificate verification?</textarea>
+        </div>
+        <button id="submit-btn" type="submit"
+                class="w-full py-3 bg-amber text-black border-none rounded font-mono text-[0.8rem] font-bold tracking-[0.1em] uppercase cursor-pointer hover:bg-amber-lt hover:shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+          ▶ Run Research
+        </button>
+      </form>
     </div>
-
-    <!-- RIGHT: Results -->
-    <div id="results-panel" class="flex flex-col gap-4">
-
-      <!-- Terminal log -->
-      <div id="terminal" class="bg-bg border border-border rounded-md overflow-hidden hidden">
-        <div class="flex items-center gap-2 px-3.5 py-2 border-b border-border bg-bg2">
-          <span class="w-2 h-2 rounded-full bg-green"></span>
-          <span class="text-[0.65rem] text-text-dim tracking-[0.1em] uppercase">agent.log</span>
-        </div>
-        <div id="terminal-body" class="px-4 py-4 text-[0.78rem] leading-[1.8] min-h-[80px]"></div>
-      </div>
-
-      <!-- Error -->
-      <div id="error-box" class="hidden bg-[rgba(248,113,113,0.06)] border border-[rgba(248,113,113,0.25)] rounded text-[0.8rem] text-red px-4 py-3.5"></div>
-
-      <!-- Session overview -->
-      <div id="card-overview" class="hidden bg-bg2 border border-border rounded-md overflow-hidden" style="animation: slideUp .3s ease">
-        <div class="flex items-center justify-between px-[18px] py-3 border-b border-border bg-bg3">
-          <span class="text-[0.72rem] text-amber tracking-[0.1em] uppercase">// Session</span>
-          <span id="status-badge"></span>
-        </div>
-        <div class="p-[18px]">
-          <div id="metrics-row" class="flex border border-border rounded overflow-hidden mb-4"></div>
-          <div id="question-display" class="text-[0.8rem] text-text-dim font-sans"></div>
-        </div>
-      </div>
-
-      <!-- Final answer -->
-      <div id="card-answer" class="hidden bg-bg2 border border-border rounded-md overflow-hidden" style="animation: slideUp .3s ease">
-        <div class="flex items-center px-[18px] py-3 border-b border-border bg-bg3">
-          <span class="text-[0.72rem] text-amber tracking-[0.1em] uppercase">// Final Answer</span>
-        </div>
-        <div class="p-[18px]">
-          <div id="answer-text" class="text-[0.88rem] text-text-bright font-sans font-light leading-[1.8] whitespace-pre-wrap"></div>
-        </div>
-      </div>
-
-      <!-- Tool calls -->
-      <div id="card-tools" class="hidden bg-bg2 border border-border rounded-md overflow-hidden" style="animation: slideUp .3s ease">
-        <div class="flex items-center justify-between px-[18px] py-3 border-b border-border bg-bg3">
-          <span class="text-[0.72rem] text-amber tracking-[0.1em] uppercase">// Tool Calls</span>
-          <span id="tools-meta" class="text-[0.68rem] text-text-dim"></span>
-        </div>
-        <div class="p-[18px]">
-          <div id="timeline" class="flex flex-col gap-0"></div>
-        </div>
-      </div>
-
-      <!-- Findings -->
-      <div id="card-findings" class="hidden bg-bg2 border border-border rounded-md overflow-hidden" style="animation: slideUp .3s ease">
-        <div class="flex items-center justify-between px-[18px] py-3 border-b border-border bg-bg3">
-          <span class="text-[0.72rem] text-amber tracking-[0.1em] uppercase">// Findings</span>
-          <span id="findings-meta" class="text-[0.68rem] text-text-dim"></span>
-        </div>
-        <div class="p-[18px]">
-          <div id="findings-list" class="flex flex-col gap-2.5"></div>
-        </div>
-      </div>
-
-      <!-- Empty state -->
-      <div id="empty-state" class="py-16 px-5 text-center text-text-dim">
-        <div class="text-[2rem] mb-3 opacity-40">🔬</div>
-        <p class="text-[0.8rem]">Submit a question to start researching a repository.</p>
-        <p class="mt-1.5 text-[0.72rem] text-text-dim">Agent runs synchronously — results appear when complete (20–90 s).</p>
-      </div>
-
-    </div><!-- /results-panel -->
   </div>
 
-  <style>
-    @keyframes slideUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-    .log-line { display: block; animation: fadeIn .2s ease; }
-    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-  </style>
+  <!-- RIGHT: Results -->
+  <div id="results-panel" class="flex flex-col gap-4">
 
-  <script>
-    const $ = id => document.getElementById(id);
+    <div id="terminal" class="bg-bg border border-border rounded-md overflow-hidden hidden">
+      <div class="flex items-center gap-2 px-3.5 py-2 border-b border-border bg-bg2">
+        <span class="w-2 h-2 rounded-full bg-green"></span>
+        <span class="text-[0.65rem] text-text-dim tracking-[0.1em] uppercase">agent.log</span>
+      </div>
+      <div id="terminal-body" class="px-4 py-4 text-[0.78rem] leading-[1.8] min-h-[80px]"></div>
+    </div>
 
-    function fillPreset(url, question) {
-      $('repo_url').value = url;
-      $('question').value = question;
+    <div id="error-box" class="hidden bg-[rgba(248,113,113,0.06)] border border-[rgba(248,113,113,0.25)] rounded text-[0.8rem] text-red px-4 py-3.5"></div>
+
+    <div id="card-overview" class="hidden bg-bg2 border border-border rounded-md overflow-hidden">
+      <div class="flex items-center justify-between px-[18px] py-3 border-b border-border bg-bg3">
+        <span class="text-[0.72rem] text-amber tracking-[0.1em] uppercase">// Session</span>
+        <span id="status-badge"></span>
+      </div>
+      <div class="p-[18px]">
+        <div id="metrics-row" class="flex border border-border rounded overflow-hidden mb-4"></div>
+        <div id="question-display" class="text-[0.8rem] text-text-dim font-sans"></div>
+      </div>
+    </div>
+
+    <div id="card-answer" class="hidden bg-bg2 border border-border rounded-md overflow-hidden">
+      <div class="flex items-center px-[18px] py-3 border-b border-border bg-bg3">
+        <span class="text-[0.72rem] text-amber tracking-[0.1em] uppercase">// Final Answer</span>
+      </div>
+      <div class="p-[18px]">
+        <div id="answer-text" class="text-[0.88rem] text-text-bright font-sans font-light leading-[1.8] whitespace-pre-wrap"></div>
+      </div>
+    </div>
+
+    <div id="card-tools" class="hidden bg-bg2 border border-border rounded-md overflow-hidden">
+      <div class="flex items-center justify-between px-[18px] py-3 border-b border-border bg-bg3">
+        <span class="text-[0.72rem] text-amber tracking-[0.1em] uppercase">// Tool Calls</span>
+        <span id="tools-meta" class="text-[0.68rem] text-text-dim"></span>
+      </div>
+      <div class="p-[18px]"><div id="timeline"></div></div>
+    </div>
+
+    <div id="card-findings" class="hidden bg-bg2 border border-border rounded-md overflow-hidden">
+      <div class="flex items-center justify-between px-[18px] py-3 border-b border-border bg-bg3">
+        <span class="text-[0.72rem] text-amber tracking-[0.1em] uppercase">// Findings</span>
+        <span id="findings-meta" class="text-[0.68rem] text-text-dim"></span>
+      </div>
+      <div class="p-[18px]"><div id="findings-list" class="flex flex-col gap-2.5"></div></div>
+    </div>
+
+    <div id="empty-state" class="py-16 px-5 text-center text-text-dim">
+      <div class="text-[2rem] mb-3 opacity-40">🔬</div>
+      <p class="text-[0.8rem]">Submit a question to start researching a repository.</p>
+      <p class="mt-1.5 text-[0.72rem]">Agent runs synchronously — results appear when complete (20–90 s).</p>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block extra_scripts %}
+<style>
+  @keyframes slideUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
+  .log-line { display:block; animation: fadeIn .2s ease; }
+  .result-card-visible { animation: slideUp .3s ease; }
+</style>
+<script>
+  const $ = id => document.getElementById(id);
+
+  function fillPreset(url, q) { $('repo_url').value = url; $('question').value = q; }
+
+  function getCsrfToken() {
+    const m = document.cookie.match(/csrftoken=([^;]+)/);
+    return m ? m[1] : '';
+  }
+
+  function log(msg, type='info') {
+    const colors = { info:'#cbd5e1', ok:'#10b981', warn:'#fbbf24', error:'#f87171', amber:'#f59e0b' };
+    const now = new Date().toLocaleTimeString('en-US',{hour12:false});
+    const line = document.createElement('span');
+    line.className = 'log-line';
+    line.innerHTML = `<span style="color:#475569">[${now}]</span><span style="color:${colors[type]||colors.info}"> ${msg}</span>`;
+    $('terminal-body').appendChild(line);
+    $('terminal-body').scrollTop = 9999;
+  }
+
+  function show(id) { const el=$(id); el.classList.remove('hidden'); el.classList.add('result-card-visible'); }
+  function hide(id) { $(id).classList.add('hidden'); $(id).classList.remove('result-card-visible'); }
+
+  function resetResults() {
+    ['card-overview','card-answer','card-tools','card-findings'].forEach(hide);
+    hide('error-box'); $('terminal-body').innerHTML='';
+    $('timeline').innerHTML=$('findings-list').innerHTML=$('answer-text').textContent='';
+  }
+
+  function badgeStyle(s) {
+    return { COMPLETE:'background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3)',
+             FAILED:'background:rgba(248,113,113,.12);color:#f87171;border:1px solid rgba(248,113,113,.25)',
+             RUNNING:'background:rgba(34,211,238,.10);color:#22d3ee;border:1px solid rgba(34,211,238,.2)',
+             PENDING:'background:rgba(71,85,105,.3);color:#475569;border:1px solid #2a3a55' }[s]||'';
+  }
+
+  function metric(v,l,last) {
+    return `<div style="flex:1;padding:12px 14px;${last?'':'border-right:1px solid #1f2a3d;'}text-align:center">
+      <div style="font-size:1.2rem;font-weight:700;color:#f59e0b;line-height:1">${v}</div>
+      <div style="font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.08em;margin-top:2px">${l}</div>
+    </div>`;
+  }
+
+  function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function renderResults(data) {
+    $('status-badge').innerHTML = `<span style="font-size:.65rem;font-weight:700;letter-spacing:.1em;padding:3px 9px;border-radius:3px;text-transform:uppercase;${badgeStyle(data.status)}">${data.status}</span>`;
+    $('question-display').textContent = data.question||data.question_preview||'';
+    const tok = (data.input_tokens||0)+(data.output_tokens||0);
+    $('metrics-row').innerHTML =
+      metric(data.iterations??'—','iterations') +
+      metric((data.input_tokens||0).toLocaleString(),'in tokens') +
+      metric((data.output_tokens||0).toLocaleString(),'out tokens') +
+      metric(tok.toLocaleString(),'total tokens',true);
+    show('card-overview');
+
+    if (data.final_answer) { $('answer-text').textContent = data.final_answer; show('card-answer'); }
+    else if (data.error)   { $('answer-text').innerHTML = `<span style="color:#f87171">${data.error}</span>`; show('card-answer'); }
+
+    const tools = data.tool_calls||[];
+    if (tools.length) {
+      $('tools-meta').textContent = `${tools.length} call${tools.length!==1?'s':''}`;
+      $('timeline').innerHTML = tools.map(tc=>`
+        <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #1f2a3d;font-size:.78rem">
+          <div style="min-width:24px;height:24px;border:1px solid #2a3a55;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;color:#475569;flex-shrink:0;margin-top:2px">${tc.sequence}</div>
+          <div style="flex:1">
+            <div style="font-weight:600;color:#22d3ee;margin-bottom:2px">${tc.tool_name}</div>
+            <div style="color:#475569;font-size:.72rem">${escHtml(JSON.stringify(tc.arguments))}</div>
+            <div style="margin-top:6px;background:#0b0d12;border:1px solid #1f2a3d;border-radius:3px;padding:8px 10px;font-size:.72rem;color:#475569;max-height:80px;overflow:hidden;position:relative" class="tl-result-fade">${escHtml(tc.result_preview||'')}</div>
+            <div style="font-size:.65rem;color:#475569;margin-top:4px">${tc.duration_ms} ms</div>
+          </div>
+        </div>`).join('');
+      show('card-tools');
     }
 
-    function getCsrfToken() {
-      const match = document.cookie.match(/csrftoken=([^;]+)/);
-      return match ? match[1] : '';
+    const findings = data.findings||[];
+    if (findings.length) {
+      $('findings-meta').textContent = `${findings.length} finding${findings.length!==1?'s':''}`;
+      $('findings-list').innerHTML = findings.map(f=>`
+        <div style="background:#0b0d12;border:1px solid #1f2a3d;border-left:3px solid #f59e0b;border-radius:4px;padding:12px 14px">
+          <div style="font-size:.78rem;color:#fcd34d;font-weight:600;margin-bottom:4px">${escHtml(f.file_path)}</div>
+          ${f.line_start?`<div style="font-size:.65rem;color:#475569;margin-bottom:6px">lines ${f.line_start}–${f.line_end??f.line_start}</div>`:''}
+          <div style="font-size:.78rem;color:#cbd5e1;font-family:var(--font-sans);font-weight:300;line-height:1.6">${escHtml(f.note)}</div>
+          ${f.confidence!=null?`<span style="display:inline-block;margin-top:6px;font-size:.62rem;color:#10b981">confidence ${(f.confidence*100).toFixed(0)}%</span>`:''}
+        </div>`).join('');
+      show('card-findings');
     }
+  }
 
-    function log(msg, type = 'info') {
-      const body = $('terminal-body');
-      const now  = new Date().toLocaleTimeString('en-US', { hour12: false });
-      const colors = { info:'#cbd5e1', ok:'#10b981', warn:'#fbbf24', error:'#f87171', amber:'#f59e0b' };
-      const line = document.createElement('span');
-      line.className = 'log-line';
-      line.innerHTML = `<span style="color:#475569">[${now}]</span><span style="color:${colors[type]||colors.info}"> ${msg}</span>`;
-      body.appendChild(line);
-      body.scrollTop = body.scrollHeight;
-    }
-
-    function clearLog()    { $('terminal-body').innerHTML = ''; }
-    function showEl(id)    { $(id).classList.remove('hidden'); }
-    function hideEl(id)    { $(id).classList.add('hidden'); }
-    function showError(msg){ const b=$('error-box'); b.textContent='✗ '+msg; showEl('error-box'); }
-    function hideError()   { hideEl('error-box'); }
-
-    function resetResults() {
-      ['card-overview','card-answer','card-tools','card-findings'].forEach(hideEl);
-      hideError(); clearLog();
-      $('timeline').innerHTML = $('findings-list').innerHTML = $('answer-text').textContent = '';
-    }
-
-    function badgeCls(s) {
-      return { COMPLETE:'background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3)',
-               FAILED:'background:rgba(248,113,113,.12);color:#f87171;border:1px solid rgba(248,113,113,.25)',
-               RUNNING:'background:rgba(34,211,238,.10);color:#22d3ee;border:1px solid rgba(34,211,238,.2)',
-               PENDING:'background:rgba(71,85,105,.3);color:#475569;border:1px solid #2a3a55' }[s] || '';
-    }
-
-    function renderResults(data) {
-      $('status-badge').innerHTML = `<span style="font-size:.65rem;font-weight:700;letter-spacing:.1em;padding:3px 9px;border-radius:3px;text-transform:uppercase;${badgeCls(data.status)}">${data.status}</span>`;
-      $('question-display').textContent = data.question || data.question_preview || '';
-
-      const totalTok = (data.input_tokens||0) + (data.output_tokens||0);
-      $('metrics-row').innerHTML = [
-        [data.iterations??'—','iterations'],
-        [(data.input_tokens||0).toLocaleString(),'in tokens'],
-        [(data.output_tokens||0).toLocaleString(),'out tokens'],
-        [totalTok.toLocaleString(),'total tokens'],
-      ].map(([v,l])=>`<div style="flex:1;padding:12px 14px;border-right:1px solid #1f2a3d;text-align:center">
-        <div style="font-size:1.2rem;font-weight:700;color:#f59e0b;line-height:1">${v}</div>
-        <div style="font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.08em;margin-top:2px">${l}</div>
-      </div>`).join('').replace(/border-right:1px solid #1f2a3d;">[^<]*<div[^>]*>[^<]*<\/div>[^<]*<\/div>$/, '">' + [totalTok.toLocaleString(),'total tokens'].map((v,i)=>i===0?v:'<div style="font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.08em;margin-top:2px">'+v+'</div>').join('') + '</div>');
-
-      // re-render metrics cleanly
-      $('metrics-row').innerHTML = [
-        [data.iterations??'—','iterations'],
-        [(data.input_tokens||0).toLocaleString(),'in tokens'],
-        [(data.output_tokens||0).toLocaleString(),'out tokens'],
-        [totalTok.toLocaleString(),'total tokens'],
-      ].map(([v,l],i,a)=>`<div style="flex:1;padding:12px 14px;${i<a.length-1?'border-right:1px solid #1f2a3d;':''}text-align:center">
-        <div style="font-size:1.2rem;font-weight:700;color:#f59e0b;line-height:1">${v}</div>
-        <div style="font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.08em;margin-top:2px">${l}</div>
-      </div>`).join('');
-
-      showEl('card-overview');
-
-      if (data.final_answer) { $('answer-text').textContent = data.final_answer; showEl('card-answer'); }
-      else if (data.error)   { $('answer-text').innerHTML = `<span style="color:#f87171">${data.error}</span>`; showEl('card-answer'); }
-
-      const tools = data.tool_calls || [];
-      if (tools.length) {
-        $('tools-meta').textContent = `${tools.length} call${tools.length!==1?'s':''}`;
-        $('timeline').innerHTML = tools.map(tc=>`
-          <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #1f2a3d;font-size:.78rem">
-            <div style="min-width:24px;height:24px;border:1px solid #2a3a55;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;color:#475569;flex-shrink:0;margin-top:2px">${tc.sequence}</div>
-            <div style="flex:1">
-              <div style="font-weight:600;color:#22d3ee;margin-bottom:2px">${tc.tool_name}</div>
-              <div style="color:#475569;font-size:.72rem">${JSON.stringify(tc.arguments)}</div>
-              <div style="margin-top:6px;background:#0b0d12;border:1px solid #1f2a3d;border-radius:3px;padding:8px 10px;font-size:.72rem;color:#475569;max-height:80px;overflow:hidden;position:relative" class="tl-result-fade">${escHtml(tc.result_preview||'')}</div>
-              <div style="font-size:.65rem;color:#475569;margin-top:4px">${tc.duration_ms} ms</div>
-            </div>
-          </div>`).join('');
-        showEl('card-tools');
+  async function runResearch(e) {
+    e.preventDefault();
+    const btn = $('submit-btn');
+    const repo_url = $('repo_url').value.trim();
+    const question = $('question').value.trim();
+    resetResults(); hide('empty-state'); show('terminal');
+    btn.disabled = true; btn.textContent = '⏳ Running...';
+    log(`Submitting request to POST /api/sessions/`,'info');
+    log(`repo_url: ${repo_url}`,'amber');
+    log(`question: ${question.slice(0,60)}${question.length>60?'…':''}`,'amber');
+    log(`◌ Agent running — cloning repo &amp; calling LLM…`,'info');
+    const start = Date.now();
+    try {
+      const res = await fetch('/api/sessions/', {
+        method:'POST',
+        headers:{'Content-Type':'application/json','X-CSRFToken':getCsrfToken()},
+        body:JSON.stringify({repo_url,question}),
+      });
+      const elapsed = ((Date.now()-start)/1000).toFixed(1);
+      if (!res.ok) {
+        const err = await res.json().catch(()=>({error:res.statusText}));
+        log(`HTTP ${res.status} after ${elapsed}s`,'error');
+        const b=$('error-box'); b.textContent=`✗ HTTP ${res.status}: ${err.error||err.detail||res.statusText}`; show('error-box');
+        return;
       }
-
-      const findings = data.findings || [];
-      if (findings.length) {
-        $('findings-meta').textContent = `${findings.length} finding${findings.length!==1?'s':''}`;
-        $('findings-list').innerHTML = findings.map(f=>`
-          <div style="background:#0b0d12;border:1px solid #1f2a3d;border-left:3px solid #f59e0b;border-radius:4px;padding:12px 14px">
-            <div style="font-size:.78rem;color:#fcd34d;font-weight:600;margin-bottom:4px">${escHtml(f.file_path)}</div>
-            ${f.line_start?`<div style="font-size:.65rem;color:#475569;margin-bottom:6px">lines ${f.line_start}–${f.line_end??f.line_start}</div>`:''}
-            <div style="font-size:.78rem;color:#cbd5e1;font-family:var(--font-sans);font-weight:300;line-height:1.6">${escHtml(f.note)}</div>
-            ${f.confidence!=null?`<span style="display:inline-block;margin-top:6px;font-size:.62rem;color:#10b981;letter-spacing:.06em">confidence ${(f.confidence*100).toFixed(0)}%</span>`:''}
-          </div>`).join('');
-        showEl('card-findings');
-      }
+      const data = await res.json();
+      log(`Response received in ${elapsed}s ✓`,'ok');
+      log(`status: ${data.status}  iterations: ${data.iterations}  tokens: ${(data.input_tokens||0)+(data.output_tokens||0)}`,'ok');
+      if (data.findings?.length) log(`${data.findings.length} finding(s) saved`,'ok');
+      if (data.tool_calls?.length) log(`${data.tool_calls.length} tool call(s) recorded`,'ok');
+      if (data.status==='FAILED') log(`FAILED: ${data.error||'unknown error'}`,'error');
+      renderResults(data);
+    } catch(err) {
+      log(`Network error: ${err.message}`,'error');
+      const b=$('error-box'); b.textContent=`✗ ${err.message}`; show('error-box');
+    } finally {
+      btn.disabled=false; btn.textContent='▶ Run Research';
     }
-
-    function escHtml(s) {
-      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    }
-
-    async function runResearch(e) {
-      e.preventDefault();
-      const btn      = $('submit-btn');
-      const repo_url = $('repo_url').value.trim();
-      const question = $('question').value.trim();
-
-      resetResults();
-      hideEl('empty-state');
-      showEl('terminal');
-      btn.disabled    = true;
-      btn.textContent = '⏳ Running...';
-
-      log(`Submitting request to POST /api/sessions/`, 'info');
-      log(`repo_url: ${repo_url}`, 'amber');
-      log(`question: ${question.slice(0,60)}${question.length>60?'…':''}`, 'amber');
-      log(`◌ Agent running — cloning repo &amp; calling LLM…`, 'info');
-
-      const start = Date.now();
-      try {
-        const res = await fetch('/api/sessions/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
-          body: JSON.stringify({ repo_url, question }),
-        });
-        const elapsed = ((Date.now()-start)/1000).toFixed(1);
-        if (!res.ok) {
-          const err = await res.json().catch(()=>({error:res.statusText}));
-          log(`HTTP ${res.status} after ${elapsed}s`, 'error');
-          showError(`HTTP ${res.status}: ${err.error||err.detail||res.statusText}`);
-          return;
-        }
-        const data = await res.json();
-        log(`Response received in ${elapsed}s ✓`, 'ok');
-        log(`status: ${data.status}  iterations: ${data.iterations}  tokens: ${(data.input_tokens||0)+(data.output_tokens||0)}`, 'ok');
-        if (data.findings?.length) log(`${data.findings.length} finding(s) saved`, 'ok');
-        if (data.tool_calls?.length) log(`${data.tool_calls.length} tool call(s) recorded`, 'ok');
-        if (data.status==='FAILED') log(`FAILED: ${data.error||'unknown error'}`, 'error');
-        renderResults(data);
-      } catch(err) {
-        log(`Network error: ${err.message}`, 'error');
-        showError(err.message);
-      } finally {
-        btn.disabled    = false;
-        btn.textContent = '▶ Run Research';
-      }
-    }
-  </script>
-
-</body>
-</html>
+  }
+</script>
+{% endblock %}

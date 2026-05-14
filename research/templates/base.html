@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Codebase Research Agent{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'css/tailwind.css' %}" />
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body class="{% block body_class %}font-mono bg-bg text-text leading-[1.7] overflow-x-hidden{% endblock %}">
+
+  <!-- Topbar -->
+  <header class="border-b border-border py-3.5 sticky top-0 bg-bg/[0.92] backdrop-blur-md z-[100]">
+    <div class="{% block topbar_container %}max-w-[900px]{% endblock %} mx-auto px-6 flex justify-between items-center">
+      <a class="text-[0.78rem] font-semibold text-amber tracking-[0.1em] uppercase no-underline" href="/">
+        <span class="text-text-dim">$</span> research<span class="text-text-dim">-</span>agent
+      </a>
+      <ul class="flex gap-6 list-none max-sm:hidden">
+        <li>
+          <a href="/"
+             class="text-[0.72rem] no-underline tracking-[0.06em] uppercase transition-colors duration-150
+                    {% if request.path == '/' %}text-amber{% else %}text-text-dim hover:text-amber{% endif %}">
+            Home
+          </a>
+        </li>
+        <li>
+          <a href="/research/"
+             class="text-[0.72rem] no-underline tracking-[0.06em] uppercase transition-colors duration-150
+                    {% if request.path == '/research/' %}text-amber{% else %}text-text-dim hover:text-amber{% endif %}">
+            Research
+          </a>
+        </li>
+        {% block extra_nav %}{% endblock %}
+        <li>
+          <a href="/admin/"
+             class="text-[0.72rem] text-text-dim no-underline tracking-[0.06em] uppercase hover:text-amber transition-colors duration-150">
+            Admin ↗
+          </a>
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Page content -->
+  {% block content %}{% endblock %}
+
+  <!-- Footer -->
+  {% block footer %}
+  <div class="h-px bg-gradient-to-r from-transparent via-amber to-transparent opacity-30"></div>
+  <div class="{% block footer_container %}max-w-[900px]{% endblock %} mx-auto px-6 relative z-[1]">
+    <footer class="py-10 flex justify-between items-center flex-wrap gap-4 max-sm:flex-col max-sm:items-start">
+      <p class="text-[0.72rem] text-text-dim">
+        Built by
+        <a class="text-amber no-underline hover:underline" href="https://github.com/mralaminahamed" target="_blank">Al Amin Ahamed</a>
+        &nbsp;·&nbsp;
+        Take-home for
+        <a class="text-amber no-underline hover:underline" href="mailto:hr@codefusionai.com">CodeFusion AI</a>
+      </p>
+      <ul class="flex gap-5 list-none">
+        <li><a class="text-[0.72rem] text-text-dim no-underline tracking-[0.06em] uppercase hover:text-amber transition-colors" href="/admin/">Admin</a></li>
+        <li><a class="text-[0.72rem] text-text-dim no-underline tracking-[0.06em] uppercase hover:text-amber transition-colors" href="/api/sessions/" target="_blank">Sessions API</a></li>
+        <li><a class="text-[0.72rem] text-text-dim no-underline tracking-[0.06em] uppercase hover:text-amber transition-colors" href="https://github.com/mralaminahamed/codebase-research-agent" target="_blank">GitHub</a></li>
+      </ul>
+    </footer>
+  </div>
+  {% endblock %}
+
+  {% block extra_scripts %}{% endblock %}
+
+</body>
+</html>
