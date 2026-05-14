@@ -17,6 +17,7 @@ DEBUG = env("DEBUG")
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
 
 INSTALLED_APPS = [
+    "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -90,4 +91,77 @@ MAX_INPUT_TOKENS: int = env("MAX_INPUT_TOKENS")
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
+}
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Research Agent",
+    "site_header": "Codebase Research Agent",
+    "site_brand": "🔬 Research Agent",
+    "site_logo": None,
+    "welcome_sign": "Codebase Research Agent — Admin",
+    "copyright": "Al Amin Ahamed",
+    "search_model": ["research.ResearchSession", "research.Repository"],
+    "topmenu_links": [
+        {"name": "API Sessions", "url": "/api/sessions/", "new_window": True},
+        {"name": "View Site", "url": "/", "new_window": False},
+    ],
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "hide_apps": [],
+    "hide_models": [],
+    "order_with_respect_to": [
+        "research",
+        "research.ResearchSession",
+        "research.Repository",
+        "research.ToolCall",
+        "research.Finding",
+        "auth",
+    ],
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.group": "fas fa-users",
+        "research.repository": "fas fa-code-branch",
+        "research.researchsession": "fas fa-search",
+        "research.toolcall": "fas fa-tools",
+        "research.finding": "fas fa-lightbulb",
+    },
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+    "related_modal_active": True,
+    "show_ui_builder": False,
+    "changeform_format": "horizontal_tabs",
+    "language_chooser": False,
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-dark",
+    "accent": "accent-primary",
+    "navbar": "navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": True,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": True,
+    "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": True,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "default",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success",
+    },
 }
