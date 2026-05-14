@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from django.views.generic import TemplateView
 from rest_framework import status
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.request import Request
@@ -14,6 +15,12 @@ from research.serializers import (
 )
 from research.services import agent
 from research.services.repo_service import RepoCloneError
+
+
+class IndexView(TemplateView):
+    """Landing page at /."""
+
+    template_name = "research/index.html"
 
 
 class StartSessionView(APIView):
