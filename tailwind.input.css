@@ -1,0 +1,82 @@
+@import "tailwindcss";
+@source "./research/templates";
+
+@theme {
+  /* Surfaces */
+  --color-bg:         #0b0d12;
+  --color-bg2:        #10131a;
+  --color-bg3:        #161b26;
+
+  /* Borders */
+  --color-border:     #1f2a3d;
+  --color-border2:    #2a3a55;
+
+  /* Amber palette */
+  --color-amber:      #f59e0b;
+  --color-amber-lt:   #fcd34d;
+  --color-amber-dim:  #78350f;
+
+  /* Semantic */
+  --color-green:      #10b981;
+  --color-cyan:       #22d3ee;
+  --color-red:        #f87171;
+  --color-yellow:     #fbbf24;
+
+  /* Text */
+  --color-text:       #cbd5e1;
+  --color-text-dim:   #475569;
+  --color-text-bright:#f1f5f9;
+
+  /* Typography */
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-sans: 'IBM Plex Sans', sans-serif;
+
+  /* Animations */
+  --animate-blink:    blink 1.2s step-end infinite;
+  --animate-spin-slow:spin-slow 0.7s linear infinite;
+  --animate-fade-up:  fadeUp 0.5s ease both;
+}
+
+@keyframes blink    { 0%,100%{opacity:1} 50%{opacity:0} }
+@keyframes spin-slow{ to{transform:rotate(360deg)} }
+@keyframes fadeUp   { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+@keyframes slideUp  { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── Global overlays (can't express as utilities) ─────────────────────── */
+@layer base {
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);
+    pointer-events: none; z-index: 9999;
+  }
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(245,158,11,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245,158,11,.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none; z-index: 0;
+  }
+}
+
+/* ── Utilities that need complex selectors ────────────────────────────── */
+@layer utilities {
+  .endpoint-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .3s ease, padding .3s ease;
+    padding: 0;
+  }
+  .endpoint-body.open {
+    max-height: 400px;
+    padding: 20px;
+  }
+  .tl-result-fade::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 24px;
+    background: linear-gradient(transparent, #0b0d12);
+  }
+}
