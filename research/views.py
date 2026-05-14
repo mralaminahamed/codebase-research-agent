@@ -23,6 +23,12 @@ class IndexView(TemplateView):
     template_name = "research/index.html"
 
 
+class ResearchUIView(TemplateView):
+    """Interactive research UI at /research/."""
+
+    template_name = "research/research.html"
+
+
 class StartSessionView(APIView):
     """Start a new research session against a public GitHub repository.
 

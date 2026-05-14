@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Run Research · Codebase Research Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:          #0b0d12;
+      --bg2:         #10131a;
+      --bg3:         #161b26;
+      --border:      #1f2a3d;
+      --border2:     #2a3a55;
+      --amber:       #f59e0b;
+      --amber-lt:    #fcd34d;
+      --amber-dim:   #78350f;
+      --amber-glow:  rgba(245,158,11,0.10);
+      --green:       #10b981;
+      --cyan:        #22d3ee;
+      --red:         #f87171;
+      --yellow:      #fbbf24;
+      --text:        #cbd5e1;
+      --text-dim:    #475569;
+      --text-bright: #f1f5f9;
+      --mono:        'IBM Plex Mono', monospace;
+      --sans:        'IBM Plex Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--mono);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* scanline */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+      pointer-events: none; z-index: 9999;
+    }
+    /* grid */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(245,158,11,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(245,158,11,0.025) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+      position: sticky; top: 0;
+      background: rgba(11,13,18,0.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    .topbar-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 24px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .topbar-logo { font-size: 0.78rem; font-weight: 600; color: var(--amber); letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; }
+    .topbar-logo span { color: var(--text-dim); }
+    .topbar-links { display: flex; gap: 24px; list-style: none; }
+    .topbar-links a { font-size: 0.72rem; color: var(--text-dim); text-decoration: none; letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.15s; }
+    .topbar-links a:hover, .topbar-links a.active { color: var(--amber); }
+
+    /* ── Layout ── */
+    .main {
+      max-width: 1100px; margin: 0 auto; padding: 48px 24px 80px;
+      position: relative; z-index: 1;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    @media (max-width: 820px) {
+      .main { grid-template-columns: 1fr; }
+    }
+
+    /* ── Panel ── */
+    .panel {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg3);
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .panel-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .dot-r { background: #f87171; }
+    .dot-y { background: #fbbf24; }
+    .dot-g { background: #34d399; }
+
+    .panel-title {
+      font-size: 0.72rem; color: var(--text-dim);
+      letter-spacing: 0.1em; text-transform: uppercase;
+      margin-left: 6px;
+    }
+
+    .panel-body { padding: 20px 18px; }
+
+    /* ── Form ── */
+    .field { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      font-size: 0.68rem;
+      color: var(--amber);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .hint { font-size: 0.65rem; color: var(--text-dim); margin-bottom: 6px; letter-spacing: 0; text-transform: none; }
+
+    input, textarea, select {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 4px;
+      color: var(--text-bright);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      resize: vertical;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--amber);
+      box-shadow: 0 0 0 2px rgba(245,158,11,0.15);
+    }
+
+    input::placeholder, textarea::placeholder { color: var(--text-dim); }
+
+    textarea { min-height: 100px; line-height: 1.6; }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23475569' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+
+    /* Presets */
+    .presets { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+    .preset-label { font-size: 0.68rem; color: var(--amber); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 4px; }
+    .preset {
+      padding: 8px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: border-color 0.12s, background 0.12s;
+      text-align: left;
+    }
+    .preset:hover { border-color: var(--amber); background: var(--amber-glow); }
+    .preset-repo { font-size: 0.7rem; color: var(--cyan); display: block; margin-bottom: 2px; }
+    .preset-q { font-size: 0.72rem; color: var(--text-dim); }
+
+    /* Submit */
+    .submit-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--amber);
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s, box-shadow 0.15s;
+    }
+    .submit-btn:hover:not(:disabled) {
+      background: var(--amber-lt);
+      box-shadow: 0 0 20px rgba(245,158,11,0.35);
+    }
+    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── Results panel ── */
+    .results-panel { display: flex; flex-direction: column; gap: 16px; }
+
+    /* ── Terminal log ── */
+    .terminal {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      display: none;
+    }
+    .terminal.visible { display: block; }
+    .terminal-header {
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .terminal-title { font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+    .terminal-body { padding: 16px; font-size: 0.78rem; line-height: 1.8; min-height: 80px; }
+    .log-line { display: block; animation: fadeIn 0.2s ease; }
+    .log-line .ts { color: var(--text-dim); margin-right: 8px; }
+    .log-line .msg-info   { color: var(--text); }
+    .log-line .msg-ok     { color: var(--green); }
+    .log-line .msg-warn   { color: var(--yellow); }
+    .log-line .msg-error  { color: var(--red); }
+    .log-line .msg-amber  { color: var(--amber); }
+    .spinner {
+      display: inline-block;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* ── Result cards ── */
+    .result-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      display: none;
+      animation: slideUp 0.3s ease;
+    }
+    .result-card.visible { display: block; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .card-header {
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg3);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-title { font-size: 0.72rem; color: var(--amber); letter-spacing: 0.1em; text-transform: uppercase; }
+    .card-meta  { font-size: 0.68rem; color: var(--text-dim); }
+    .card-body  { padding: 18px; }
+
+    /* Status badge */
+    .badge {
+      display: inline-block;
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
+      padding: 3px 9px; border-radius: 3px; text-transform: uppercase;
+    }
+    .badge-complete { background: rgba(16,185,129,0.15); color: var(--green);  border: 1px solid rgba(16,185,129,0.3); }
+    .badge-failed   { background: rgba(248,113,113,0.12); color: var(--red);   border: 1px solid rgba(248,113,113,0.25); }
+    .badge-running  { background: rgba(34,211,238,0.10);  color: var(--cyan);  border: 1px solid rgba(34,211,238,0.2); }
+    .badge-pending  { background: rgba(71,85,105,0.3);    color: var(--text-dim); border: 1px solid var(--border2); }
+
+    /* Metrics row */
+    .metrics {
+      display: flex; gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 4px; overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .metric {
+      flex: 1; padding: 12px 14px;
+      border-right: 1px solid var(--border);
+      text-align: center;
+    }
+    .metric:last-child { border-right: none; }
+    .metric-val   { font-size: 1.2rem; font-weight: 700; color: var(--amber); line-height: 1; }
+    .metric-label { font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+
+    /* Final answer */
+    .answer-text {
+      font-family: var(--sans); font-weight: 300;
+      font-size: 0.88rem; line-height: 1.8;
+      color: var(--text-bright);
+      white-space: pre-wrap;
+    }
+    code {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-size: 0.85em;
+      color: var(--amber-lt);
+    }
+
+    /* Tool calls timeline */
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .tl-item {
+      display: flex; gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.78rem;
+    }
+    .tl-item:last-child { border-bottom: none; }
+    .tl-seq {
+      min-width: 24px; height: 24px;
+      border: 1px solid var(--border2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.62rem; color: var(--text-dim);
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .tl-content { flex: 1; }
+    .tl-tool { font-weight: 600; color: var(--cyan); margin-bottom: 2px; }
+    .tl-args { color: var(--text-dim); font-size: 0.72rem; font-family: var(--mono); }
+    .tl-result {
+      margin-top: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 8px 10px;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      max-height: 80px;
+      overflow: hidden;
+      position: relative;
+    }
+    .tl-result::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 24px;
+      background: linear-gradient(transparent, var(--bg));
+    }
+    .tl-dur { font-size: 0.65rem; color: var(--text-dim); margin-top: 4px; }
+
+    /* Findings */
+    .findings { display: flex; flex-direction: column; gap: 10px; }
+    .finding {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--amber);
+      border-radius: 4px;
+      padding: 12px 14px;
+    }
+    .finding-path {
+      font-size: 0.78rem; color: var(--amber-lt); font-weight: 600; margin-bottom: 4px;
+    }
+    .finding-lines { font-size: 0.65rem; color: var(--text-dim); margin-bottom: 6px; }
+    .finding-note {
+      font-size: 0.78rem; color: var(--text); font-family: var(--sans); font-weight: 300; line-height: 1.6;
+    }
+    .finding-confidence {
+      display: inline-block; margin-top: 6px;
+      font-size: 0.62rem; color: var(--green); letter-spacing: 0.06em;
+    }
+
+    /* Error state */
+    .error-box {
+      background: rgba(248,113,113,0.06);
+      border: 1px solid rgba(248,113,113,0.25);
+      border-radius: 4px;
+      padding: 14px 16px;
+      font-size: 0.8rem;
+      color: var(--red);
+      display: none;
+    }
+    .error-box.visible { display: block; }
+
+    /* Empty state */
+    .empty-state {
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--text-dim);
+    }
+    .empty-state .icon { font-size: 2rem; margin-bottom: 12px; opacity: 0.4; }
+    .empty-state p { font-size: 0.8rem; }
+  </style>
+</head>
+
+<body>
+
+<!-- Topbar -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="topbar-logo" href="/">
+      <span>$</span> research<span>-</span>agent
+    </a>
+    <ul class="topbar-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/research/" class="active">Research</a></li>
+      <li><a href="/admin/">Admin ↗</a></li>
+    </ul>
+  </div>
+</header>
+
+<!-- Main grid -->
+<div class="main">
+
+  <!-- LEFT: Form -->
+  <div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-dot dot-r"></span>
+        <span class="panel-dot dot-y"></span>
+        <span class="panel-dot dot-g"></span>
+        <span class="panel-title">new_session.sh</span>
+      </div>
+      <div class="panel-body">
+
+        <!-- Quick presets -->
+        <div class="presets">
+          <div class="preset-label">Quick presets</div>
+
+          <button class="preset" onclick="fillPreset('https://github.com/psf/requests', 'How does requests handle SSL certificate verification?')">
+            <span class="preset-repo">psf/requests</span>
+            <span class="preset-q">How does requests handle SSL certificate verification?</span>
+          </button>
+
+          <button class="preset" onclick="fillPreset('https://github.com/psf/requests', 'Where is authentication implemented in the requests library?')">
+            <span class="preset-repo">psf/requests</span>
+            <span class="preset-q">Where is authentication implemented?</span>
+          </button>
+
+          <button class="preset" onclick="fillPreset('https://github.com/pallets/flask', 'How does Flask handle request routing internally?')">
+            <span class="preset-repo">pallets/flask</span>
+            <span class="preset-q">How does Flask handle request routing internally?</span>
+          </button>
+        </div>
+
+        <hr style="border-color: var(--border); margin-bottom: 18px;" />
+
+        <form id="research-form" onsubmit="runResearch(event)">
+          <div class="field">
+            <label for="repo_url">GitHub repository URL</label>
+            <div class="hint">Must be a public HTTPS GitHub URL</div>
+            <input
+              id="repo_url" type="url" name="repo_url"
+              placeholder="https://github.com/owner/repo"
+              value="https://github.com/psf/requests"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label for="question">Research question</label>
+            <div class="hint">Be specific. Min 10 chars.</div>
+            <textarea
+              id="question" name="question"
+              placeholder="How does the authentication module work?"
+              minlength="10"
+              required
+            >How does requests handle SSL certificate verification?</textarea>
+          </div>
+
+          <button class="submit-btn" type="submit" id="submit-btn">
+            ▶ Run Research
+          </button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Results -->
+  <div class="results-panel" id="results-panel">
+
+    <!-- Terminal log -->
+    <div class="terminal" id="terminal">
+      <div class="terminal-header">
+        <span class="panel-dot dot-g"></span>
+        <span class="terminal-title">agent.log</span>
+      </div>
+      <div class="terminal-body" id="terminal-body"></div>
+    </div>
+
+    <!-- Error -->
+    <div class="error-box" id="error-box"></div>
+
+    <!-- Session overview -->
+    <div class="result-card" id="card-overview">
+      <div class="card-header">
+        <span class="card-title">// Session</span>
+        <span id="status-badge"></span>
+      </div>
+      <div class="card-body">
+        <div class="metrics" id="metrics-row"></div>
+        <div id="question-display" style="font-size:0.8rem;color:var(--text-dim);font-family:var(--sans);"></div>
+      </div>
+    </div>
+
+    <!-- Final answer -->
+    <div class="result-card" id="card-answer">
+      <div class="card-header">
+        <span class="card-title">// Final Answer</span>
+      </div>
+      <div class="card-body">
+        <div class="answer-text" id="answer-text"></div>
+      </div>
+    </div>
+
+    <!-- Tool calls -->
+    <div class="result-card" id="card-tools">
+      <div class="card-header">
+        <span class="card-title">// Tool Calls</span>
+        <span class="card-meta" id="tools-meta"></span>
+      </div>
+      <div class="card-body">
+        <div class="timeline" id="timeline"></div>
+      </div>
+    </div>
+
+    <!-- Findings -->
+    <div class="result-card" id="card-findings">
+      <div class="card-header">
+        <span class="card-title">// Findings</span>
+        <span class="card-meta" id="findings-meta"></span>
+      </div>
+      <div class="card-body">
+        <div class="findings" id="findings-list"></div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" id="empty-state">
+      <div class="icon">🔬</div>
+      <p>Submit a question to start researching a repository.</p>
+      <p style="margin-top:6px;font-size:0.72rem;color:var(--text-dim)">Agent runs synchronously — results appear when complete (20–90 s).</p>
+    </div>
+
+  </div><!-- /results-panel -->
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+
+  // ── Preset fill ─────────────────────────────────────────────────────────
+  function fillPreset(url, question) {
+    $('repo_url').value  = url;
+    $('question').value  = question;
+    $('repo_url').focus();
+  }
+
+  // ── Terminal log ─────────────────────────────────────────────────────────
+  let logCount = 0;
+  function log(msg, type = 'info') {
+    const body = $('terminal-body');
+    const now  = new Date().toLocaleTimeString('en-US', { hour12: false });
+    const line = document.createElement('span');
+    line.className = 'log-line';
+    line.innerHTML = `<span class="ts">[${now}]</span><span class="msg-${type}">${msg}</span>`;
+    body.appendChild(line);
+    body.scrollTop = body.scrollHeight;
+    logCount++;
+  }
+
+  function clearLog() {
+    $('terminal-body').innerHTML = '';
+    logCount = 0;
+  }
+
+  // ── State helpers ────────────────────────────────────────────────────────
+  function showTerminal()        { $('terminal').classList.add('visible'); }
+  function hideEmpty()           { $('empty-state').style.display = 'none'; }
+  function showCard(id)          { $(id).classList.add('visible'); }
+  function hideCard(id)          { $(id).classList.remove('visible'); }
+  function showError(msg)        { const b = $('error-box'); b.textContent = '✗ ' + msg; b.classList.add('visible'); }
+  function hideError()           { $('error-box').classList.remove('visible'); }
+
+  function resetResults() {
+    ['card-overview','card-answer','card-tools','card-findings'].forEach(hideCard);
+    hideError();
+    clearLog();
+    $('timeline').innerHTML    = '';
+    $('findings-list').innerHTML = '';
+    $('answer-text').textContent = '';
+  }
+
+  // ── Status badge ─────────────────────────────────────────────────────────
+  function badgeClass(status) {
+    return { COMPLETE: 'badge-complete', FAILED: 'badge-failed', RUNNING: 'badge-running', PENDING: 'badge-pending' }[status] || 'badge-pending';
+  }
+
+  // ── Render results ───────────────────────────────────────────────────────
+  function renderResults(data) {
+    // Overview
+    $('status-badge').innerHTML = `<span class="badge ${badgeClass(data.status)}">${data.status}</span>`;
+    $('question-display').textContent = data.question || data.question_preview || '';
+
+    const totalTok = (data.input_tokens || 0) + (data.output_tokens || 0);
+    $('metrics-row').innerHTML = `
+      <div class="metric"><div class="metric-val">${data.iterations ?? '—'}</div><div class="metric-label">iterations</div></div>
+      <div class="metric"><div class="metric-val">${(data.input_tokens || 0).toLocaleString()}</div><div class="metric-label">in tokens</div></div>
+      <div class="metric"><div class="metric-val">${(data.output_tokens || 0).toLocaleString()}</div><div class="metric-label">out tokens</div></div>
+      <div class="metric"><div class="metric-val">${totalTok.toLocaleString()}</div><div class="metric-label">total tokens</div></div>
+    `;
+    showCard('card-overview');
+
+    // Final answer
+    if (data.final_answer) {
+      $('answer-text').textContent = data.final_answer;
+      showCard('card-answer');
+    } else if (data.error) {
+      $('answer-text').innerHTML = `<span style="color:var(--red)">${data.error}</span>`;
+      showCard('card-answer');
+    }
+
+    // Tool calls
+    const tools = data.tool_calls || [];
+    if (tools.length) {
+      $('tools-meta').textContent = `${tools.length} call${tools.length !== 1 ? 's' : ''}`;
+      $('timeline').innerHTML = tools.map(tc => `
+        <div class="tl-item">
+          <div class="tl-seq">${tc.sequence}</div>
+          <div class="tl-content">
+            <div class="tl-tool">${tc.tool_name}</div>
+            <div class="tl-args">${JSON.stringify(tc.arguments)}</div>
+            <div class="tl-result">${escHtml(tc.result_preview || '')}</div>
+            <div class="tl-dur">${tc.duration_ms} ms</div>
+          </div>
+        </div>
+      `).join('');
+      showCard('card-tools');
+    }
+
+    // Findings
+    const findings = data.findings || [];
+    if (findings.length) {
+      $('findings-meta').textContent = `${findings.length} finding${findings.length !== 1 ? 's' : ''}`;
+      $('findings-list').innerHTML = findings.map(f => `
+        <div class="finding">
+          <div class="finding-path">${escHtml(f.file_path)}</div>
+          ${f.line_start ? `<div class="finding-lines">lines ${f.line_start}–${f.line_end ?? f.line_start}</div>` : ''}
+          <div class="finding-note">${escHtml(f.note)}</div>
+          ${f.confidence != null ? `<span class="finding-confidence">confidence ${(f.confidence * 100).toFixed(0)}%</span>` : ''}
+        </div>
+      `).join('');
+      showCard('card-findings');
+    }
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ── Main research handler ────────────────────────────────────────────────
+  async function runResearch(e) {
+    e.preventDefault();
+    const btn      = $('submit-btn');
+    const repo_url = $('repo_url').value.trim();
+    const question = $('question').value.trim();
+
+    resetResults();
+    hideEmpty();
+    showTerminal();
+    btn.disabled   = true;
+    btn.textContent = '⏳ Running...';
+
+    log(`Submitting request to POST /api/sessions/`, 'info');
+    log(`repo_url: ${repo_url}`, 'amber');
+    log(`question: ${question.slice(0, 60)}${question.length > 60 ? '…' : ''}`, 'amber');
+    log(`<span class="spinner">◌</span> Agent running — cloning repo & calling LLM…`, 'info');
+
+    const start = Date.now();
+
+    try {
+      const res = await fetch('/api/sessions/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ repo_url, question }),
+      });
+
+      const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: res.statusText }));
+        log(`HTTP ${res.status} after ${elapsed}s`, 'error');
+        log(JSON.stringify(err), 'error');
+        showError(`HTTP ${res.status}: ${err.error || err.detail || res.statusText}`);
+        return;
+      }
+
+      const data = await res.json();
+      log(`Response received in ${elapsed}s ✓`, 'ok');
+      log(`status: ${data.status}  iterations: ${data.iterations}  tokens: ${(data.input_tokens||0)+(data.output_tokens||0)}`, 'ok');
+
+      if (data.findings?.length) log(`${data.findings.length} finding(s) saved`, 'ok');
+      if (data.tool_calls?.length) log(`${data.tool_calls.length} tool call(s) recorded`, 'ok');
+      if (data.status === 'FAILED') log(`FAILED: ${data.error || 'unknown error'}`, 'error');
+
+      renderResults(data);
+
+    } catch (err) {
+      const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+      log(`Network error after ${elapsed}s`, 'error');
+      log(err.message, 'error');
+      showError(err.message);
+    } finally {
+      btn.disabled    = false;
+      btn.textContent = '▶ Run Research';
+    }
+  }
+</script>
+
+</body>
+</html>

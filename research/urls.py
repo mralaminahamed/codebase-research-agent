@@ -1,6 +1,6 @@
 from django.urls import path
 
-from research.views import IndexView, RepositorySessionsView, SessionDetailView, StartSessionView
+from research.views import IndexView, RepositorySessionsView, ResearchUIView, SessionDetailView, StartSessionView
 
 app_name = "research"
 
