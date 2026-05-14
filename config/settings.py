@@ -30,6 +30,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -75,6 +76,8 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MEDIA_ROOT = env("MEDIA_ROOT", default=str(BASE_DIR / "media"))
@@ -132,6 +135,8 @@ JAZZMIN_SETTINGS = {
     "show_ui_builder": False,
     "changeform_format": "horizontal_tabs",
     "language_chooser": False,
+    "custom_css": "admin/css/custom_admin.css",
+    "custom_js": None,
 }
 
 JAZZMIN_UI_TWEAKS = {
