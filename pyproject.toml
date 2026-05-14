@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "codebase-research-agent"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "django==5.0.*",
+    "djangorestframework==3.15.*",
+    "psycopg[binary]==3.*",
+    "openai>=1.30",
+    "anthropic>=0.40",
+    "gitpython==3.1.*",
+    "django-environ==0.11.*",
+    "gunicorn>=21.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.*",
+    "pytest-django==4.*",
+    "ruff",
+    "black",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+select = ["E", "F", "I", "UP"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["research", "config"]
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
