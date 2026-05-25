@@ -2,8 +2,6 @@
 
 > An AI agent that answers technical questions about public GitHub repositories by exploring the code itself, using tool-calling. Every research session is persisted to PostgreSQL. The agent reads prior findings before re-exploring the same repository.
 
-Built as a take-home assessment for **CodeFusion AI** — Senior Backend Developer.
-
 **Author:** Al Amin Ahamed · [github.com/mralaminahamed](https://github.com/mralaminahamed) · [alaminahamed.com](https://alaminahamed.com)
 
 ---
