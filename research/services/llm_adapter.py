@@ -409,6 +409,15 @@ def get_llm_adapter(provider: str | None = None) -> LLMAdapter:
         client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
         return AnthropicAdapter(client=client, model=settings.ANTHROPIC_MODEL)
 
+    if p == "ollama":
+        import openai
+
+        client = openai.OpenAI(
+            base_url=f"{settings.OLLAMA_BASE_URL.rstrip('/')}/v1",
+            api_key="ollama",
+        )
+        return OpenAIAdapter(client=client, model=settings.OLLAMA_MODEL)
+
     raise ImproperlyConfigured(
-        f"Unknown LLM_PROVIDER {p!r}. Valid values: 'openai', 'anthropic'."
+        f"Unknown LLM_PROVIDER {p!r}. Valid values: 'openai', 'anthropic', 'ollama'."
     )
