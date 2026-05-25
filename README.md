@@ -1,20 +1,20 @@
 # Codebase Research Agent
 
-> An AI agent that answers technical questions about public GitHub repositories by exploring the code itself, using tool-calling. Every research session is persisted to PostgreSQL. The agent reads prior findings before re-exploring the same repository.
+An AI agent that answers technical questions about any public GitHub repository
+by exploring the code itself — using tool-calling, not embeddings or pre-indexing.
+Every session is persisted to PostgreSQL; the agent reads prior findings before
+re-exploring the same repo, making the database a real memory layer.
+
+**Stack:** Python 3.11 · Django 5.0 · Django REST Framework · PostgreSQL 16 · OpenAI / Anthropic / Ollama
 
 **Author:** Al Amin Ahamed · [github.com/mralaminahamed](https://github.com/mralaminahamed) · [alaminahamed.com](https://alaminahamed.com)
 
 ---
 
-## Stack
-
-Python 3.11 · Django 5.0 · Django REST Framework · PostgreSQL 16 · OpenAI / Anthropic (env-switchable)
-
----
-
 ## Quick Start
 
-**Prerequisites:** Docker + Docker Compose; an OpenAI or Anthropic API key.
+**Prerequisites:** Docker + Docker Compose; an API key for your chosen LLM provider.
+For Ollama (local inference), no API key is needed — just set `OLLAMA_BASE_URL` in `.env`.
 
 ```bash
 # 1. Clone
@@ -36,13 +36,25 @@ docker compose exec web python scripts/seed_sample_data.py
 
 # 6. Create an admin superuser
 docker compose exec web python manage.py createsuperuser
-
-# 7. Run the demo
-bash scripts/run_demo.sh
 ```
 
-Application: `http://localhost:8000/`
-Django Admin: `http://localhost:8000/admin/`
+| Interface | URL |
+|-----------|-----|
+| Web UI    | `http://localhost:8080/research/` |
+| Admin     | `http://localhost:8080/admin/` |
+| API base  | `http://localhost:8080/api/` |
+
+---
+
+## Web UI
+
+Open `http://localhost:8080/research/` for an interactive interface — paste a GitHub URL
+and a question, hit **Research**, and watch tool calls stream in real time as the agent
+explores the repository. Results include the final answer plus a table of every tool
+invocation and finding the agent produced.
+
+The admin at `/admin/` exposes all sessions, tool calls, and findings with full filtering
+and hierarchy views.
 
 ---
 
@@ -50,21 +62,23 @@ Django Admin: `http://localhost:8000/admin/`
 
 All settings are via environment variables in `.env`. Copy `.env.example` and populate:
 
-| Variable | Default | Required | Description |
-|---|---|---|---|
-| `SECRET_KEY` | — | ✓ | Django secret key |
-| `DEBUG` | `True` | | Django debug mode |
-| `DATABASE_URL` | `postgres://postgres:postgres@db:5432/research` | ✓ | Postgres connection string |
-| **`LLM_PROVIDER`** | `openai` | ✓ | `openai` or `anthropic` — switches the active LLM |
-| `OPENAI_API_KEY` | — | If `LLM_PROVIDER=openai` | OpenAI API key |
-| `OPENAI_MODEL` | `gpt-4o` | | OpenAI model to use |
-| `ANTHROPIC_API_KEY` | — | If `LLM_PROVIDER=anthropic` | Anthropic API key |
-| `ANTHROPIC_MODEL` | `claude-sonnet-4-6` | | Anthropic model to use |
-| `MAX_AGENT_ITERATIONS` | `12` | | Maximum tool-call iterations per session |
-| `MAX_INPUT_TOKENS` | `40000` | | Cumulative input-token budget per session |
-| `MEDIA_ROOT` | `/app/media` | | Where repository clones are stored |
+| Variable               | Default                                          | Required            | Description                                             |
+|------------------------|--------------------------------------------------|---------------------|---------------------------------------------------------|
+| `SECRET_KEY`           | —                                                | ✓                   | Django secret key                                       |
+| `DEBUG`                | `True`                                           |                     | Django debug mode                                       |
+| `DATABASE_URL`         | `postgres://postgres:postgres@db:5432/research`  | ✓                   | Postgres connection string                              |
+| **`LLM_PROVIDER`**     | `openai`                                         | ✓                   | `openai`, `anthropic`, or `ollama`                      |
+| `OPENAI_API_KEY`       | —                                                | if `openai`         | OpenAI API key                                          |
+| `OPENAI_MODEL`         | `gpt-4o`                                         |                     | OpenAI model                                            |
+| `ANTHROPIC_API_KEY`    | —                                                | if `anthropic`      | Anthropic API key                                       |
+| `ANTHROPIC_MODEL`      | `claude-sonnet-4-6`                              |                     | Anthropic model                                         |
+| `OLLAMA_BASE_URL`      | `http://localhost:11434`                         | if `ollama`         | Use `host.docker.internal` on Mac/Windows inside Docker |
+| `OLLAMA_MODEL`         | `llama3.2`                                       | if `ollama`         | Ollama model name                                       |
+| `MAX_AGENT_ITERATIONS` | `20`                                             |                     | Tool-call iteration cap per session                     |
+| `MAX_INPUT_TOKENS`     | `40000`                                          |                     | Cumulative input-token budget per session               |
+| `MEDIA_ROOT`           | `/app/media`                                     |                     | Where repository clones are stored                      |
 
-To switch providers, change `LLM_PROVIDER` and populate the corresponding API key. The inactive provider's key can remain blank.
+Only the active provider's settings are required. The inactive providers' keys can be left blank.
 
 ---
 
@@ -75,7 +89,7 @@ Three endpoints under `/api/`.
 ### `POST /api/sessions/` — Start a research session
 
 ```bash
-curl -s -X POST http://localhost:8000/api/sessions/ \
+curl -s -X POST http://localhost:8080/api/sessions/ \
   -H "Content-Type: application/json" \
   -d '{
     "repo_url": "https://github.com/tiangolo/fastapi",
@@ -83,7 +97,8 @@ curl -s -X POST http://localhost:8000/api/sessions/ \
   }' | jq .
 ```
 
-This call is **synchronous** — it blocks until the agent completes (typically 20–90 seconds for a small repo). Returns the full session including tool calls and findings.
+This call is **synchronous** — it blocks until the agent completes (typically 20–90 seconds
+for a small repo). Returns the full session including tool calls and findings.
 
 **Response shape:**
 
@@ -126,13 +141,13 @@ This call is **synchronous** — it blocks until the agent completes (typically 
 ### `GET /api/sessions/<uuid>/` — Retrieve a session
 
 ```bash
-curl -s http://localhost:8000/api/sessions/8a4b1c2d-.../ | jq .
+curl -s http://localhost:8080/api/sessions/8a4b1c2d-.../ | jq .
 ```
 
 ### `GET /api/repositories/<id>/sessions/` — List past sessions for a repo
 
 ```bash
-curl -s 'http://localhost:8000/api/repositories/1/sessions/?page=1' | jq .
+curl -s 'http://localhost:8080/api/repositories/1/sessions/?page=1' | jq .
 ```
 
 Paginated, page size 20.
@@ -144,13 +159,17 @@ Paginated, page size 20.
 On every new session, the agent:
 
 1. Clones (or fetches) the target repository locally (shallow, `--depth=1`).
-2. **First tool call is always `get_previous_findings(repo_url)`** — if prior sessions found relevant code locations, the agent builds on them instead of re-exploring from scratch. This makes the database a real memory layer, not a passive log.
+2. **First tool call is always `get_previous_findings(repo_url)`** — if prior sessions found
+   relevant code locations, the agent builds on them instead of re-exploring from scratch.
+   This makes the database a real memory layer, not a passive log.
 3. Uses `list_files`, `search_code`, and `read_file` to locate relevant code.
 4. Calls `save_finding(file_path, note, line_start, line_end)` for each location worth remembering.
-5. Stops when it has enough information, or when the iteration cap (default 12) or token budget (default 40,000 input tokens) is reached.
+5. Stops when it has enough information, or when the iteration cap (default 20) or token
+   budget (default 40,000 input tokens) is reached.
 6. Returns a final answer that cites specific files and line numbers.
 
-Every tool invocation is persisted as a `ToolCall` row. Every `save_finding` call creates a `Finding` row. Both are visible in the Django admin.
+Every tool invocation is persisted as a `ToolCall` row. Every `save_finding` call creates
+a `Finding` row. Both are visible in the Django admin and returned in the API response.
 
 ---
 
@@ -163,10 +182,10 @@ codebase-research-agent/
 │   ├── models.py        # Repository, ResearchSession, ToolCall, Finding
 │   ├── admin.py
 │   ├── serializers.py
-│   ├── views.py         # Three DRF endpoints
+│   ├── views.py         # Three DRF endpoints + research UI view
 │   ├── urls.py
 │   └── services/
-│       ├── llm_adapter.py    # LLMAdapter ABC + OpenAIAdapter + AnthropicAdapter + factory
+│       ├── llm_adapter.py    # LLMAdapter ABC + OpenAIAdapter + AnthropicAdapter + OllamaAdapter + factory
 │       ├── repo_service.py   # Clone, validate, path safety
 │       ├── code_tools.py     # list_files, read_file, search_code, get_file_summary
 │       ├── db_tools.py       # save_finding, get_previous_findings, list_past_sessions
@@ -179,9 +198,7 @@ codebase-research-agent/
 ├── Dockerfile
 ├── pyproject.toml
 ├── .env.example
-├── README.md
-├── DECISIONS.md
-└── ARCHITECTURE.md
+└── README.md
 ```
 
 ---
@@ -206,24 +223,31 @@ No real API calls are made during tests.
 
 ## Switching LLM Provider
 
-To run with Anthropic instead of OpenAI:
+Change `LLM_PROVIDER` in `.env` and restart the web container. No other changes needed —
+the agent loop, tool registry, and database schema are entirely provider-agnostic.
 
+**Anthropic:**
 ```bash
-# In .env:
+# .env
 LLM_PROVIDER=anthropic
 ANTHROPIC_API_KEY=sk-ant-...
 
 docker compose restart web
 ```
 
-That's the only change required. The agent loop, tool registry, and database schema are entirely provider-agnostic.
+**Ollama (local):**
+```bash
+# .env
+LLM_PROVIDER=ollama
+OLLAMA_BASE_URL=http://host.docker.internal:11434  # Mac/Windows inside Docker
+OLLAMA_MODEL=llama3.2
 
----
+docker compose restart web
+```
 
-## Design Documents
-
-- **`DECISIONS.md`** — Architecture overview, schema rationale, trade-offs, AI tool usage (500–800 words per the brief).
-- **`ARCHITECTURE.md`** — Detailed component breakdown, sequence diagrams, adapter pattern design, future-work register.
+> **Note:** Ollama model tool-call support varies. Models that output tool calls as plain
+> JSON text rather than structured function calls will not work reliably with the agent loop.
+> `llama3.2` and `mistral-nemo` have been tested.
 
 ---
 
