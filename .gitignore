@@ -49,3 +49,8 @@ coverage.xml
 
 # Docker
 .dockerignore
+
+# Internal planning docs — never track
+ARCHITECTURE.md
+IMPLEMENTATION_PLAN.md
+CLAUDE_CODE_PROMPTS.md
